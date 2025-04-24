@@ -4,13 +4,13 @@ import { api } from "../../scripts/api.js";
 import { GridModal } from "./modal/GridModal.js";
 import { ImageList } from "./ImageList.js";
 
-// Ensures picker nodes have a unique identifier if more than one appears in
-// the graph.
-var counter = 1;
-
 // Python node type.
 const NODE_TYPE = 'LiebsPicker';
 
+// Create a tab ID to identify prompts run in this tab.
+const pickerTabId = `${new Date().valueOf()}_${Math.floor(Math.random() * 1000)}`;
+
+// Register the ComfyUI extension.
 app.registerExtension({
 	name: "LiebsPicker",
     settings: [
@@ -31,25 +31,19 @@ app.registerExtension({
 
         // Add a listener for image picking.
         api.addEventListener("liebs-picker-images", async (event) => { 
-            const data = event.detail;
+            const detail = event.detail;
 
-            // Determine if the picker exists in this graph before handling
-            // the message.     
-            const node = app.graph
-                .findNodesByType(NODE_TYPE)
-                .find(n => n.pickerId === data.picker_id)
-
-            if (!node) {
-                // The message is not for this graph.
+            if (pickerTabId !== detail.picker_id) {
+                // Not the tab that ran the prompt.
                 return;
             }
 
             // Contains the list of images and their selection status.
-            const imageList = new ImageList(data.urls);
+            const imageList = new ImageList(detail.urls);
             
             // Show the modal.
             const modal = new GridModal({
-                title: node.title,
+                title: detail.title,
                 imageList,                
             });
 
@@ -61,7 +55,7 @@ app.registerExtension({
 
             // Wait for the modal to be resolved.            
             const body = new FormData();
-            body.append('picker_id', data.picker_id);
+            body.append('picker_id', detail.picker_id);
             switch(await modal.result) {
                 case 'send': 
                     body.append('result', 'send');
@@ -78,16 +72,16 @@ app.registerExtension({
             });
         });
     },
+    async afterConfigureGraph(missingNodes, app) {
+        // Graph changed - probably a workflow was loaded, or the workflow tab changed.
+        console.log(arguments);
+    },
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (nodeType.comfyClass === NODE_TYPE) { 
             const onNodeCreated = nodeType.prototype.onNodeCreated;
             nodeType.prototype.onNodeCreated = function () {     
-                const r = onNodeCreated?.apply(this, arguments);   
+                const r = onNodeCreated?.apply(this, arguments);
 
-                // Generate a unique identifier for this picker instance.
-                const pickerId = `${new Date().valueOf()}_${++counter}`;
-                this.pickerId = pickerId;
-                
                 // Add a custom widget for the hidden picker_id input.
                 // Nothing is displayed in the node.
                 this.addCustomWidget({
@@ -95,7 +89,19 @@ app.registerExtension({
                     name: 'picker_id',
                     size: [0,0],
                     async serializeValue(nodeId, widgetIndex) {
-                       return pickerId;
+                        return pickerTabId;
+                    }
+                });
+
+                // Add a custom widget for the hidden title input.
+                // Pass the node title in case the workflow changes.
+                const node = this;
+                this.addCustomWidget({
+                    type: 'STRING',
+                    name: 'title',
+                    size: [0,0],
+                    async serializeValue(nodeId, widgetIndex) {
+                        return node.title
                     }
                 });
 

@@ -32,7 +32,9 @@ class LiebsPicker(PreviewImage):
                 "images": ("IMAGE",),
             },
             "hidden": {
-                "picker_id": ("STRING",)
+                "picker_id": ("STRING",),
+                "title": ("STRING",),
+                "unique_id": "UNIQUE_ID",
             }
         }
 
@@ -42,10 +44,10 @@ class LiebsPicker(PreviewImage):
     CATEGORY = "image_filter"
     OUTPUT_NODE = False
 
-    def IS_CHANGED(images, picker_id):
+    def IS_CHANGED(images, picker_id, title, unique_id):
         return float("NaN")
 
-    def func(self, images, picker_id):
+    def func(self, images, picker_id, title, unique_id):
         # Use PreviewImage to save images to temp directory.
         urls:list[str] = self.save_images(images=images)['ui']['images']
 
@@ -53,7 +55,12 @@ class LiebsPicker(PreviewImage):
         mailbox[picker_id] = None
 
         # Send a message to the frontend to display the images.
-        req = {"picker_id": picker_id, "urls": urls}
+        req = ({
+            "picker_id": picker_id, 
+            "title": title, 
+            "unique_id": unique_id, 
+            "urls": urls
+        })
         send_request("liebs-picker-images", req)
         
         # Wait for a response from the frontend.
