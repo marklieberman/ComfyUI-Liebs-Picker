@@ -1,0 +1,113 @@
+const ELEMENT_HTML = `
+    <img>
+    <div class="overlay"></div>
+`;
+
+const ATTRIB_DATA_SELECT = 'data-selected';
+
+/**
+ * Element that displays an image from an ImageList.
+ */
+export class ImageListImageElement extends HTMLElement {
+
+    constructor() {
+        super();
+
+        this.index = null;
+
+        // Construct the element from HTML.
+        this.innerHTML = ELEMENT_HTML;
+        this.el = {
+            image: this.querySelector('img')
+        };
+
+        // Create event handlers for this instance.
+        this.handlerClick = this.onClick.bind(this);
+        this.addEventListener('click', this.handlerClick);
+        this.handlerMousedown = this.onMousedown.bind(this);
+        this.addEventListener('mousedown', this.handlerMousedown);        
+        this.handlerImageSelect = this.onImageSelect.bind(this);
+    }
+
+    // Set the image list from which the image will be displayed.
+    setImageList(value, index = 0) {
+        this.imageList = value;       
+        this.imageList.addEventListener('image-select', this.handlerImageSelect);
+        this.setIndex(index);
+    }
+
+    // Set the index of the image in the image list to display.
+    setIndex(value) {      
+        if (this.index !== value)  {
+            this.index = value;
+            this.el.image.src = this.imageList.getImageUrl(value);
+            this.updateSelectedAttribute();
+            
+            this.dispatchEvent(new CustomEvent('image-index', {
+                detail: {
+                    imageList: this.imageList,
+                    index: this.index
+                }
+            }));
+        }
+    }
+
+    updateSelectedAttribute(selected) {
+        if (selected === undefined) {
+            selected = this.imageList.isSelected(this.index);
+        }
+        this.setAttribute(ATTRIB_DATA_SELECT, selected ? 'yes' : 'no');
+    }
+
+    // Invoked when mousedown on the image.
+    onMousedown(event) {
+        this.dispatchEvent(new CustomEvent('image-mousedown', {
+            detail: {
+                button: event.button,
+                imageList: this.imageList,
+                index: this.index
+            }
+        }));
+    }
+
+    // Invoked when the image is clicked.
+    onClick(event) {
+        this.dispatchEvent(new CustomEvent('image-click', {
+            detail: {
+                imageList: this.imageList,
+                index: this.index
+            }
+        }));
+    }
+
+    // Invoked when the selection in the image list changes.
+    onImageSelect(event) {
+        const detail = event.detail;
+        if (detail.index === this.index) {
+            this.updateSelectedAttribute(detail.selected);
+        }
+    }
+
+    // Return a promise that is resoved with the width and height of an image.
+    async getImageSize() {
+        const self = this;
+        return new Promise((resolve, reject) => {
+            function check(n) {
+                if (self.el.image.naturalWidth) {
+                    resolve([
+                        self.el.image.naturalWidth,
+                        self.el.image.naturalHeight
+                    ]);
+                }
+                else if (n > 100) {
+                    reject();
+                } else {
+                    setTimeout(check.bind(null, n + 1), 100);
+                }
+            }
+            check(1);
+        });
+    }
+}
+
+customElements.define('liebs-picker-image', ImageListImageElement);
