@@ -87,7 +87,9 @@ app.registerExtension({
                 this.addCustomWidget({
                     type: 'STRING',
                     name: 'picker_id',
-                    size: [0,0],
+                    computeSize() {
+                        return [0,0]
+                    },
                     async serializeValue(nodeId, widgetIndex) {
                         return pickerTabId;
                     }
@@ -99,7 +101,9 @@ app.registerExtension({
                 this.addCustomWidget({
                     type: 'STRING',
                     name: 'title',
-                    size: [0,0],
+                    computeSize() {
+                        return [0,0]
+                    },
                     async serializeValue(nodeId, widgetIndex) {
                         return node.title
                     }
