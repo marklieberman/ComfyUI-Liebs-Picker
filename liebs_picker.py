@@ -11,11 +11,10 @@ mailbox = {}
 Handler to receive messages from the frontend.
 """
 @PromptServer.instance.routes.post('/liebs-picker-message')
-async def liebs_picker_on_message(request):
+async def liebs_picker_message(request):
     post = await request.post()
-    picker_id = post.get("picker_id")
-    mailbox[picker_id] = { "result": post.get("result"), "selection": post.get("selection") }
-    print(mailbox)
+    picker_tab_id = post.get("picker_tab_id")
+    mailbox[picker_tab_id] = { "result": post.get("result"), "selection": post.get("selection") }
     return web.json_response({})
 
 """
@@ -32,7 +31,7 @@ class LiebsPicker(PreviewImage):
                 "images": ("IMAGE",),
             },
             "hidden": {
-                "picker_id": ("STRING",),
+                "picker_tab_id": ("STRING",),
                 "title": ("STRING",),
                 "unique_id": "UNIQUE_ID",
             }
@@ -44,19 +43,19 @@ class LiebsPicker(PreviewImage):
     CATEGORY = "image_filter"
     OUTPUT_NODE = False
 
-    def IS_CHANGED(images, picker_id, title, unique_id):
+    def IS_CHANGED(images, picker_tab_id, title, unique_id):
         return float("NaN")
 
-    def func(self, images, picker_id, title, unique_id):
+    def func(self, images, picker_tab_id, title, unique_id):
         # Use PreviewImage to save images to temp directory.
         urls:list[str] = self.save_images(images=images)['ui']['images']
 
         # Prepare a slot to receive a message.
-        mailbox[picker_id] = None
+        mailbox[picker_tab_id] = None
 
         # Send a message to the frontend to display the images.
         req = ({
-            "picker_id": picker_id, 
+            "picker_tab_id": picker_tab_id, 
             "title": title, 
             "unique_id": unique_id, 
             "urls": urls
@@ -64,13 +63,12 @@ class LiebsPicker(PreviewImage):
         send_request("liebs-picker-images", req)
         
         # Wait for a response from the frontend.
-        while mailbox[picker_id] is None:
+        while mailbox[picker_tab_id] is None:
             throw_exception_if_processing_interrupted()
             time.sleep(0.2)
 
-        res = mailbox[picker_id]
-        del mailbox[picker_id]
-        print(res)
+        res = mailbox[picker_tab_id]
+        del mailbox[picker_tab_id]
         
         if res["result"] == "cancel" or not res["selection"]:
             # User cancelled the run.

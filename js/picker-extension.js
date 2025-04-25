@@ -4,11 +4,25 @@ import { api } from "../../scripts/api.js";
 import { GridModal } from "./modal/GridModal.js";
 import { ImageList } from "./ImageList.js";
 
+/**
+ * Generate a unique identifier using current millis and random.
+ */
+function generatePickerTabId() {
+    return `${new Date().valueOf()}_${Math.floor(Math.random() * 1000)}`
+}
+
+// Generate or restore the picker tab ID.
+const PICKER_TAB_ID_KEY  = 'liebsPickerTabId';
+var pickerTabId = sessionStorage.getItem(PICKER_TAB_ID_KEY);
+if (pickerTabId) {
+    console.log('Restored picker tab ID', pickerTabId);
+} else {
+    pickerTabId = generatePickerTabId();
+    sessionStorage.setItem(PICKER_TAB_ID_KEY, pickerTabId);
+}
+
 // Python node type.
 const NODE_TYPE = 'LiebsPicker';
-
-// Create a tab ID to identify prompts run in this tab.
-const pickerTabId = `${new Date().valueOf()}_${Math.floor(Math.random() * 1000)}`;
 
 // Register the ComfyUI extension.
 app.registerExtension({
@@ -33,7 +47,7 @@ app.registerExtension({
         api.addEventListener("liebs-picker-images", async (event) => { 
             const detail = event.detail;
 
-            if (pickerTabId !== detail.picker_id) {
+            if (pickerTabId !== detail.picker_tab_id) {
                 // Not the tab that ran the prompt.
                 return;
             }
@@ -55,7 +69,7 @@ app.registerExtension({
 
             // Wait for the modal to be resolved.            
             const body = new FormData();
-            body.append('picker_id', detail.picker_id);
+            body.append('picker_tab_id', detail.picker_tab_id);
             switch(await modal.result) {
                 case 'send': 
                     body.append('result', 'send');
@@ -72,21 +86,17 @@ app.registerExtension({
             });
         });
     },
-    async afterConfigureGraph(missingNodes, app) {
-        // Graph changed - probably a workflow was loaded, or the workflow tab changed.
-        console.log(arguments);
-    },
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (nodeType.comfyClass === NODE_TYPE) { 
             const onNodeCreated = nodeType.prototype.onNodeCreated;
             nodeType.prototype.onNodeCreated = function () {     
                 const r = onNodeCreated?.apply(this, arguments);
 
-                // Add a custom widget for the hidden picker_id input.
+                // Add a custom widget for the hidden picker_tab_id input.
                 // Nothing is displayed in the node.
                 this.addCustomWidget({
                     type: 'STRING',
-                    name: 'picker_id',
+                    name: 'picker_tab_id',
                     computeSize() {
                         return [0,0]
                     },
@@ -115,4 +125,40 @@ app.registerExtension({
     }
 })
 
+/**
+ * We generate a unique ID for each tab running ComfyUI. This unique "picker tab ID" makes the messages from the prompt 
+ * server addressable to the tabs. The picker tab ID is stored in sessionStorage so it will persist even when the tab 
+ * is refreshed. 
+ * 
+ * The Duplicate Tab function in browsers will also duplicate the sessionStorage contents. Using a BroadcastChannel, we 
+ * can ask other ComfyUI tabs if the picker tab ID we restored is already being used. A new picker tab ID can be 
+ * generated if so.
+ */
 
+// Setup a channel to communicate with other tabs running ComfyUI.
+const broadcastChannel = new BroadcastChannel('liebs-picker');
+broadcastChannel.addEventListener('message', (event) => {    
+    const message = event.data;    
+    switch (message?.topic) {
+        // Another tab is asking for our picker tab ID.
+        case 'getPickerTabId':            
+            broadcastChannel.postMessage({
+                topic: 'usingPickerTabId',
+                pickerTabId
+            });
+            break;
+        // Another tab is reporting which picker tab ID it is using.
+        case 'usingPickerTabId':            
+            if (message.pickerTabId === pickerTabId) {
+                // Need to generate a new picker tab ID.
+                pickerTabId = generatePickerTabId();
+                sessionStorage.setItem(PICKER_TAB_ID_KEY, pickerTabId);
+                console.log('Generated a new picker tab ID', pickerTabId);
+            }
+    }
+});
+
+// Ask all of the other tabs for their picker tab ID.
+broadcastChannel.postMessage({
+    topic: 'getPickerTabId'
+});
