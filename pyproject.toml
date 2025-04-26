@@ -1,0 +1,14 @@
+[project]
+name = "liebs-picker"
+description = "A node to pause execution of the workflow and select which input images should proceed to the output."
+version = "1.0.0"
+license = {file = "LICENSE"}
+
+[project.urls]
+Repository = "https://github.com/marklieberman/ComfyUI-Liebs-Picker"
+#  Used by Comfy Registry https://comfyregistry.org
+
+[tool.comfy]
+PublisherId = ""
+DisplayName = "ComfyUI-Liebs-Picker"
+Icon = ""
