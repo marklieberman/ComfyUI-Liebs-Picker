@@ -66,7 +66,7 @@ export class ZoomModal extends BaseModal {
 
         // Create event handlers for this modal.
         this.handlerMouseWheel = this.onMouseWheel.bind(this);
-        this.addEventListener('mousewheel', this.handlerMouseWheel);        
+        this.addEventListener('wheel', this.handlerMouseWheel);        
 
         this.handlerCancel = this.onCancel.bind(this);
         this.el.cancelButton.addEventListener('click', this.handlerCancel);
@@ -158,11 +158,11 @@ export class ZoomModal extends BaseModal {
         } else 
         if (event.key === 'Home') {
             handled = true;
-            thia.onFirst();
+            this.onFirst();
         } else 
         if (event.key === 'End') {
             handled = true;
-            thia.onLast();
+            this.onLast();
         }
         // Select an image with E or /.
         if (letterKey === 'E' || letterKey === '/') {

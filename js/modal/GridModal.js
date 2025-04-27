@@ -107,6 +107,7 @@ export class GridModal extends BaseModal {
         for (let n = 0; n < images.length; n++) {
             const gridX = Math.floor(n / bestLayout.imagesPerRow) + 1, 
                 gridY = n % bestLayout.imagesPerRow + 1;
+            images[n].style.aspectRatio = `${imageWidth} / ${imageHeight}`;
             images[n].style.gridArea = `${gridX} / ${gridY} /  auto / auto`;
             images[n].style.maxHeight = `${bestLayout.cellHeight}px`;
             images[n].style.maxWidth = `${bestLayout.cellWidth}px`;
