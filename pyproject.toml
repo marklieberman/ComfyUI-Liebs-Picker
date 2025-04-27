@@ -9,6 +9,6 @@ Repository = "https://github.com/marklieberman/ComfyUI-Liebs-Picker"
 #  Used by Comfy Registry https://comfyregistry.org
 
 [tool.comfy]
-PublisherId = ""
+PublisherId = "markliebs"
 DisplayName = "ComfyUI-Liebs-Picker"
 Icon = ""
