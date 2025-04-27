@@ -270,8 +270,7 @@ export class ZoomModal extends BaseModal {
     }
 
     onLast() {
-        const index = this.el.image.index,
-            imageList = this.el.image.imageList,
+        const imageList = this.el.image.imageList,
             lastIndex = imageList.length - 1;
 
         this.el.image.setIndex(lastIndex);

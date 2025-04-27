@@ -30,7 +30,7 @@ app.registerExtension({
     settings: [
         {
             id: "ImagePicker.OpenZoomed",
-            name: "Open in Zoomed View",
+            name: "Open in Single Image View",
             type: "boolean",
             defaultValue: false
         },
@@ -61,10 +61,10 @@ app.registerExtension({
                 imageList,                
             });
 
-            if (app.extensionManager.setting.get('LiebsPicker.OpenZoomed')) {
+            if (app.extensionManager.setting.get('ImagePicker.OpenZoomed')) {
                 modal.switchToZoomModal(0);
             } else {
-                modal.attach();
+                await modal.attach();
             }
 
             // Wait for the modal to be resolved.            

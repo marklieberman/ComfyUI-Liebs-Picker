@@ -44,17 +44,23 @@ export class BaseModal extends HTMLElement {
     async layout() { }
 
     // Attach the modal to the DOM.
-    attach() {
+    async attach() {
         if (!this.attached) {
             this.classList.add('first-layout');
             document.body.appendChild(this);
             this.attached = true;
-            this.layout();
-            setTimeout(() => {
-                this.focus();
-            }, 100);
-            
+            this.layout();            
+
+            // Delay focus until modal is attached to DOM.
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    this.focus();
+                    resolve();
+                }, 0);
+            })
         }
+
+        return Promise.resolve();
     }
 
     // Detach the modal from the DOM.
