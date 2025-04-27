@@ -130,6 +130,8 @@ export class ZoomModal extends BaseModal {
     onKeyDown(event) {
         let handled = false;
 
+        const letterKey = event.key.toUpperCase();
+
         // Back to grid view with spacebar.
         if (event.key === ' ') {
             handled = true;
@@ -145,14 +147,31 @@ export class ZoomModal extends BaseModal {
             handled = true;
             this.onSend();
         } else
-        // Move back and forward with arrow keys.
-        if (event.key === 'Left') {
+        // Move back and forward with arrow keys or A and D.
+        if (event.key === 'ArrowLeft' || letterKey === 'A') {
             handled = true;
-            this.onPrevious()
+            this.onPrevious();
         } else
-        if (event.key === 'Right') {
+        if (event.key === 'ArrowRight' || letterKey === 'D') {
             handled = true;
-            this.onCancel();
+            this.onNext();
+        } else 
+        if (event.key === 'Home') {
+            handled = true;
+            thia.onFirst();
+        } else 
+        if (event.key === 'End') {
+            handled = true;
+            thia.onLast();
+        }
+        // Select an image with E or /.
+        if (letterKey === 'E' || letterKey === '/') {
+            handled = true;
+
+            const imageList = this.el.image.imageList,
+                index = this.el.image.index;
+
+            imageList.toggleSelect(index);
         }
 
         if (handled) {

@@ -127,7 +127,7 @@ export class GridModal extends BaseModal {
                 handled = true;
                 this.imageList.toggleSelect(n);
             }
-        } else 
+        } else         
         // Cancel the modal with Escape.
         if ((event.key === 'Escape')) {
             handled = true;
@@ -179,7 +179,7 @@ export class GridModal extends BaseModal {
             el.addEventListener('image-click', this.handlerImageClick);
             el.addEventListener('image-mousedown', this.handlerImageMouseDown);
             el.addEventListener('mouseenter', this.handlerImageMouseEnter);
-            el.addEventListener('mouseleave', this.handlerImageMouseLeave);
+            el.addEventListener('mouseleave', this.handlerImageMouseLeave);            
             this.el.imageList.appendChild(el);
         }
     }
