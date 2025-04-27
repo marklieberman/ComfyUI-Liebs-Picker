@@ -10,11 +10,17 @@ A node to pause execution of the workflow and select which input images should p
 
 * Modal only displays in the browser tab that was running the workflow.
 
+
+| Workflow example | Grid view | Single image view |
+|----|----|----|
+| ![Example workflow with the node](./docs/images/workflow.png) | ![Screenshot of the grid view](./docs/images/grid-modal.png) | ![Screenshot of the single image view](./docs/images/zoom-modal.png) |
+| The node accepts a list of images and returns a filtered list of images. | Images are displayed in a grid for selection. | Single image mode allows you to view each image using all available space. |
+
 ## Controls
 
 * Middle-click or spacebar toggles between grid view and single image view.
 
-* E, forward-slash /, or left click to select or deselect images.
+* E, forward-slash /, or left-click to select or deselect images.
 
 * Enter to proceed with selection, or Escape to cancel workflow.
 
