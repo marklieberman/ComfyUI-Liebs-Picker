@@ -1,9 +1,15 @@
 const ELEMENT_HTML = `
     <img>
     <div class="overlay"></div>
+    <div class="actions">
+        <button class="unwanted" title="Toggle Unwanted">
+            <span class="p-button-icon pi pi-ban"></span>
+        </button>
+    </div>
 `;
 
 const ATTRIB_DATA_SELECT = 'data-selected';
+const ATTRIB_DATA_UNWANTED = 'data-unwanted';
 
 /**
  * Element that displays an image from an ImageList.
@@ -18,7 +24,8 @@ export class ImageListImageElement extends HTMLElement {
         // Construct the element from HTML.
         this.innerHTML = ELEMENT_HTML;
         this.el = {
-            image: this.querySelector('img')
+            image: this.querySelector('img'),
+            unwantedButton: this.querySelector('.unwanted')
         };
 
         // Create event handlers for this instance.
@@ -26,13 +33,18 @@ export class ImageListImageElement extends HTMLElement {
         this.addEventListener('click', this.handlerClick);
         this.handlerMousedown = this.onMousedown.bind(this);
         this.addEventListener('mousedown', this.handlerMousedown);        
-        this.handlerImageSelect = this.onImageSelect.bind(this);
+        this.handlerImageAttributeChanged = this.onImageAttributeChanged.bind(this);
+        
+        // Bind action button click handlers.
+        this.handlerActionUnwanted = this.onActionClick.bind(this, 'unwanted');        
+        this.el.unwantedButton.addEventListener('click', this.handlerActionUnwanted);
     }
 
     // Set the image list from which the image will be displayed.
     setImageList(value, index = 0) {
         this.imageList = value;       
-        this.imageList.addEventListener('image-select', this.handlerImageSelect);
+        this.imageList.addEventListener('image-select', this.handlerImageAttributeChanged);
+        this.imageList.addEventListener('image-unwanted', this.handlerImageAttributeChanged);
         this.setIndex(index);
     }
 
@@ -41,7 +53,7 @@ export class ImageListImageElement extends HTMLElement {
         if (this.index !== value)  {
             this.index = value;
             this.el.image.src = this.imageList.getImageUrl(value);
-            this.updateSelectedAttribute();
+            this.updateAttributes();
             
             this.dispatchEvent(new CustomEvent('image-index', {
                 detail: {
@@ -52,11 +64,13 @@ export class ImageListImageElement extends HTMLElement {
         }
     }
 
-    updateSelectedAttribute(selected) {
-        if (selected === undefined) {
-            selected = this.imageList.isSelected(this.index);
-        }
+    // Update the attributes that decorate the image.
+    updateAttributes() {
+        const selected = this.imageList.isSelected(this.index),
+            unwanted = this.imageList.isUnwanted(this.index);
+
         this.setAttribute(ATTRIB_DATA_SELECT, selected ? 'yes' : 'no');
+        this.setAttribute(ATTRIB_DATA_UNWANTED, unwanted ? 'yes' : 'no');
     }
 
     // Invoked when mousedown on the image.
@@ -71,7 +85,7 @@ export class ImageListImageElement extends HTMLElement {
     }
 
     // Invoked when the image is clicked.
-    onClick(event) {
+    onClick() {        
         this.dispatchEvent(new CustomEvent('image-click', {
             detail: {
                 imageList: this.imageList,
@@ -80,11 +94,24 @@ export class ImageListImageElement extends HTMLElement {
         }));
     }
 
+    // Invoked when a action button is clicked.
+    onActionClick(action, event) {
+        event.preventDefault();
+        event.stopPropagation();        
+        this.dispatchEvent(new CustomEvent(`image-action`, {
+            detail: {
+                action,
+                imageList: this.imageList,
+                index: this.index
+            }
+        }));
+    }
+
     // Invoked when the selection in the image list changes.
-    onImageSelect(event) {
+    onImageAttributeChanged(event) {
         const detail = event.detail;
         if (detail.index === this.index) {
-            this.updateSelectedAttribute(detail.selected);
+            this.updateAttributes();
         }
     }
 

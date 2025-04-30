@@ -12,7 +12,8 @@ export class ImageList extends EventTarget {
         for (const url of comfyUrls) {
             this.items.push({
                 url,
-                selected: false
+                selected: false,
+                unwanted: false
             })
         }
     }
@@ -55,14 +56,17 @@ export class ImageList extends EventTarget {
             detail: {
                 imageList: this,
                 index,
-                selected: value
+                selected: value,
+                unwnated: this.items[index].unwanted
             }            
         }));
     }
 
     // Toggle selection of the image at index.
     toggleSelect(index) {
-        this.select(index, !this.items[index].selected);
+        const selected = this.items[index].selected;
+        this.select(index, !selected);
+        return selected;
     }
 
     // Get the URL for the image at index.
@@ -71,4 +75,28 @@ export class ImageList extends EventTarget {
         return api.apiURL(`/view?filename=${encodeURIComponent(url.filename)}&type=${url.type ?? "input"}&subfolder=${url.subfolder ?? ""}&r=${Math.random()}`);
     }
 
+    // True if the image at index is unwanted, otherwise false.
+    isUnwanted(index) {
+        return this.items[index].unwanted;
+    }
+
+    // Want or unwant the image at index.
+    unwanted(index, value) {
+        this.items[index].unwanted = value;
+        this.dispatchEvent(new CustomEvent('image-unwanted', {
+            detail: {
+                imageList: this,
+                index,
+                selected: this.items[index].selected,
+                unwanted: value
+            }            
+        }));
+    }
+
+    // Toggle unwanted of the image at index.
+    toggleUnwanted(index) {
+        const unwanted = !this.items[index].unwanted;
+        this.unwanted(index, unwanted);
+        return unwanted;
+    }
 }

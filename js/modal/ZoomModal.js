@@ -84,10 +84,13 @@ export class ZoomModal extends BaseModal {
         this.handlerLast = this.onLast.bind(this);
         this.el.lastButton.addEventListener('click', this.handlerLast);
 
+        this.handlerImageSelect = this.onImageSelect.bind(this);        
         this.handlerImageIndex = this.onImageIndex.bind(this);
         this.el.image.addEventListener('image-index', this.handlerImageIndex);
         this.handlerImageClick = this.onImageClick.bind(this);
         this.el.image.addEventListener('image-click', this.handlerImageClick);
+        this.handlerImageAction = this.onImageAction.bind(this);
+        this.el.image.addEventListener('image-action', this.handlerImageAction);
         this.handlerImageMousedown = this.onImageMousedown.bind(this);
         this.el.image.addEventListener('image-mousedown', this.handlerImageMousedown);        
 
@@ -163,15 +166,22 @@ export class ZoomModal extends BaseModal {
         if (event.key === 'End') {
             handled = true;
             this.onLast();
-        }
+        } else
         // Select an image with E or /.
         if (letterKey === 'E' || letterKey === '/') {
             handled = true;
-
             const imageList = this.el.image.imageList,
                 index = this.el.image.index;
-
+            imageList.unwanted(index, false);
             imageList.toggleSelect(index);
+        } else
+        // Unwant an image with X.
+        if (letterKey === 'X' || letterKey === '\'') {
+            handled = true;
+            const imageList = this.el.image.imageList,
+                index = this.el.image.index;                
+            imageList.select(index, false);
+            imageList.toggleUnwanted(index);
         }
 
         if (handled) {
@@ -214,11 +224,13 @@ export class ZoomModal extends BaseModal {
     // Set the list of images to display.
     setImageList(value, index = 0) {        
         this.el.image.setImageList(value, index);                
+        value.addEventListener('image-select', this.handlerImageSelect);
     }
 
     setIndex(value) {
         this.el.image.setIndex(value);
     }
+
     // Invoked when the image index in the image list is changed.
     onImageIndex(event) {
         const detail = event.detail, 
@@ -229,11 +241,28 @@ export class ZoomModal extends BaseModal {
         this.el.prevButton.disabled = detail.index <= 0;
     }
 
+    // Invoked when the selection in the image list changes.
+    onImageSelect() {
+        this.updateSendButton();
+    }
+
     // Invoked when an image is clicked.
     onImageClick(event) {
-        const detail = event.detail;        
-        this.el.image.imageList.toggleSelect(detail.index);
-        this.updateSendButton();
+        const detail = event.detail,
+            imageList = this.el.image.imageList;
+
+        imageList.toggleSelect(detail.index);
+    }
+
+    // Invoked when an action button is clicked on an image.
+    onImageAction(event) {
+        const detail = event.detail,
+            imageList = this.el.image.imageList;
+
+        if (detail.action === 'unwanted') {
+            imageList.select(detail.index, false);
+            imageList.toggleUnwanted(detail.index);
+        }
     }
 
     // Invoked when mousedown on an image.

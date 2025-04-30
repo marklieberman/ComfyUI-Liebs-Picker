@@ -117,8 +117,8 @@ liebs-picker-image img {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    border-radius: 4px;
     border: 2px solid transparent;
+    border-radius: 4px;
 }
 
 liebs-picker-image .overlay {
@@ -127,8 +127,16 @@ liebs-picker-image .overlay {
     left: 2px;
     right: 2px;
     bottom: 2px;
-    border-radius: 4px;
+    border-radius: 4px;    
     pointer-events: none;
+}
+
+liebs-picker-image:focus {
+    outline: none;
+}
+
+liebs-picker-image:focus .overlay {    
+    border: 2px solid #0cf;
 }
 
 liebs-picker-image:hover .overlay {
@@ -143,10 +151,54 @@ liebs-picker-image[data-selected="yes"]:hover .overlay {
     box-shadow: inset 0 0 20px 4px #0F0;
 }
 
-liebs-picker-image:focus {
-    outline: none;
+liebs-picker-image[data-unwanted="yes"] img {
+    filter: grayscale(1) brightness(0.1);
 }
 
-liebs-picker-image:focus .overlay {    
+liebs-picker-image[data-unwanted="yes"]:hover .overlay {
+    box-shadow: none !important;
+}
+
+liebs-picker-image .actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    opacity: 0;
+    transition: 1s opacity ease-out;
+
+    color: #000;
+    background-color: rgba(0, 0, 0, 0.2);
+    border: none;
+    border-radius: 4px;
+}
+
+liebs-picker-image[data-unwanted="yes"] .actions {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+liebs-picker-image .actions:hover {
+    opacity: 0.8;
+    transition-duration: 250ms;
+}
+
+liebs-picker-image .actions button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 42px;
+    height: 38px;    
+    background: none;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+liebs-picker-image .actions button:focus {
+    outline: none;
     border: 2px solid #0cf;
+}
+
+liebs-picker-image .actions button:hover {    
+    color: #fff;
 }

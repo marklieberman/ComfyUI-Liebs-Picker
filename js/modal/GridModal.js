@@ -39,12 +39,13 @@ export class GridModal extends BaseModal {
         this.handlerCancel = this.onCancel.bind(this);
         this.el.cancelButton.addEventListener('click', this.handlerCancel);
 
-        this.handlerImageClick = this.onImageClick.bind(this);
-        this.handlerImageMouseDown = this.onImageMouseDown.bind(this);
         this.handlerImageSelect = this.onImageSelect.bind(this);
+        this.handlerImageClick = this.onImageClick.bind(this);
+        this.handlerImageAction = this.onImageAction.bind(this);
+        this.handlerImageMouseDown = this.onImageMouseDown.bind(this);        
         this.handlerImageMouseEnter = this.onImageMouseEnter.bind(this);
         this.handlerImageMouseLeave = this.onImageMouseLeave.bind(this);
-        this.handlerImageFocus = this.onImageFocus.bind(this);
+        this.handlerImageFocus = this.onImageFocus.bind(this);        
 
         // Initialize the modal controls.
         this.mouseOverImage = null;        
@@ -125,6 +126,16 @@ export class GridModal extends BaseModal {
 
         const letterKey = event.key.toUpperCase();
 
+        // Get the index of the image with focus.        
+        const getFocusedIndex = () => {
+            if (this.lastFocusImage === document.activeElement) {
+                return this.lastFocusImage.index;
+            } else 
+            if (this.mouseOverImage) {
+                return this.mouseOverImage.index;
+            }
+        };
+
         // Select up to 10 images using numeric keys.
         let n = parseInt(event.key);
         if (Number.isInteger(n)) {
@@ -144,7 +155,7 @@ export class GridModal extends BaseModal {
             handled = true;
             this.onSend();
         } else 
-        //Move around the grid with arrow keys or W and S.
+        // Move around the grid with arrow keys or W and S.
         if (event.key === 'ArrowUp' || letterKey === 'W') {
             handled = true;
             this.lastMoveSource = 'keyboard';
@@ -174,31 +185,38 @@ export class GridModal extends BaseModal {
             handled = true;
             this.lastMoveSource = 'keyboard';
             this.el.imageList.lastChild.focus();
-        }
+        } else
         // Select an image with E or /.
         if (letterKey === 'E' || letterKey === '/') {
+            handled = true;            
+            const index = getFocusedIndex();    
+            this.imageList.toggleSelect(index);
+            this.imageList.unwanted(index, false);            
+        } else
+        // Unwant an image with X or '.
+        if (letterKey === 'X' || letterKey === '\'') {
             handled = true;
-            if (this.lastFocusImage === document.activeElement) {
-                this.imageList.toggleSelect(this.lastFocusImage.index);
-            } else 
-            if (this.mouseOverImage) {
-                this.imageList.toggleSelect(this.mouseOverImage.index);
-            }
+            const index = getFocusedIndex();            
+            this.imageList.select(index, false);
+            this.imageList.toggleUnwanted(index);
         }
         // Zoom an image with spacebar.
         if ((event.key === ' ')) {            
             handled = true;
+            let index;
             if (this.lastMoveSource === 'keyboard') {
                 if (this.lastFocusImage === document.activeElement) {
-                    this.switchToZoomModal(this.lastFocusImage.index);
+                    index = this.lastFocusImage.index;                    
                 }    
             } else
             if (this.lastMoveSource === 'mouse') {
                 if (this.mouseOverImage) {
-                    this.lastFocusImage = this.mouseOverImage;
-                    this.switchToZoomModal(this.mouseOverImage.index);
+                    index = this.mouseOverImage.index;
+                    this.lastFocusImage = this.mouseOverImage;                    
                 }
             }
+
+            this.switchToZoomModal(index);
         }
 
         if (handled) {
@@ -236,7 +254,8 @@ export class GridModal extends BaseModal {
             el.tabIndex = 0;
             el.setImageList(value, i);
             el.addEventListener('image-click', this.handlerImageClick);
-            el.addEventListener('image-mousedown', this.handlerImageMouseDown);
+            el.addEventListener('image-action', this.handlerImageAction);
+            el.addEventListener('image-mousedown', this.handlerImageMouseDown);            
             el.addEventListener('mouseenter', this.handlerImageMouseEnter);
             el.addEventListener('mouseleave', this.handlerImageMouseLeave);            
             el.addEventListener('focus', this.handlerImageFocus);     
@@ -244,13 +263,28 @@ export class GridModal extends BaseModal {
         }
     }
 
+    // Invoked when the selection in the image list changes.
+    onImageSelect() {
+        this.updateSendButton();
+    }
+
     // Invoked when an image is clicked.
     onImageClick(event) {
         const detail = event.detail;        
         this.imageList.toggleSelect(detail.index);
+        this.imageList.unwanted(detail.index, false)
         
         // Reset focus back to the modal to avoid focus outlines on the images when not using keyboard.
         this.focus();
+    }
+
+    // Invoked when an action button is clicked on an image.
+    onImageAction(event) {
+        const detail = event.detail;            
+        if (detail.action === 'unwanted') {
+            this.imageList.select(detail.index, false);
+            this.imageList.toggleUnwanted(detail.index);
+        }
     }
 
     // Invoked when the mouse enters an image.
@@ -276,7 +310,7 @@ export class GridModal extends BaseModal {
     // Invoked when an image in the grid receives focus.
     onImageFocus(event) {
         this.lastFocusImage = event.srcElement;        
-    }
+    } 
 
     // Get an image from the grid by ites coordinate position.
     getImageFromGrid(x, y) {
@@ -296,11 +330,6 @@ export class GridModal extends BaseModal {
             // When focus element doesn't exist, we're at the edge of the grid.
             (focusEl ? focusEl : this.lastFocusImage)?.focus();
         }
-    }
-
-    // Invoked when the selection in the image list changes.
-    onImageSelect() {
-        this.updateSendButton();
     }
 
     // Invoked when the Send button is clicked.
