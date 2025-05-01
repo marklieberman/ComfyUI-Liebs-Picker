@@ -2,6 +2,9 @@ const ELEMENT_HTML = `
     <img>
     <div class="overlay"></div>
     <div class="actions">
+        <button class="select" title="Toggle Select">
+            <span class="p-button-icon pi pi-check"></span>
+        </button>
         <button class="unwanted" title="Toggle Unwanted">
             <span class="p-button-icon pi pi-ban"></span>
         </button>
@@ -25,6 +28,7 @@ export class ImageListImageElement extends HTMLElement {
         this.innerHTML = ELEMENT_HTML;
         this.el = {
             image: this.querySelector('img'),
+            selectButton: this.querySelector('.select'),
             unwantedButton: this.querySelector('.unwanted')
         };
 
@@ -36,6 +40,8 @@ export class ImageListImageElement extends HTMLElement {
         this.handlerImageAttributeChanged = this.onImageAttributeChanged.bind(this);
         
         // Bind action button click handlers.
+        this.handlerActionSelect = this.onActionClick.bind(this, 'select');
+        this.el.selectButton.addEventListener('click', this.handlerActionSelect);
         this.handlerActionUnwanted = this.onActionClick.bind(this, 'unwanted');        
         this.el.unwantedButton.addEventListener('click', this.handlerActionUnwanted);
     }

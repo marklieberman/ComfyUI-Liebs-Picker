@@ -44,6 +44,17 @@ export class ImageList extends EventTarget {
         return result;
     }
 
+    // Count wanted items in the list.
+    get wantedCount() {
+        let count = 0;
+        for (const image of this.items) {
+            if (!image.unwanted) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     // True if the image at index is selected, otherwise false.
     isSelected(index) {
         return this.items[index].selected;

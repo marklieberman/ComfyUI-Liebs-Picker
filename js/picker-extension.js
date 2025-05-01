@@ -1,8 +1,8 @@
-import { app } from "../../scripts/app.js";
-import { api } from "../../scripts/api.js";
+import { app } from '../../scripts/app.js';
+import { api } from '../../scripts/api.js';
 
-import { GridModal } from "./modal/GridModal.js";
-import { ImageList } from "./ImageList.js";
+import { GridModal } from './modal/GridModal.js';
+import { ImageList } from './ImageList.js';
 
 /**
  * Generate a unique identifier using current millis and random.
@@ -26,26 +26,49 @@ const NODE_TYPE = 'LiebsPicker';
 
 // Register the ComfyUI extension.
 app.registerExtension({
-	name: "LiebsPicker",
-    settings: [
-        {
-            id: "ImagePicker.OpenZoomed",
-            name: "Open in Single Image View",
-            type: "boolean",
-            defaultValue: false
+	name: 'LiebsPicker',
+    settings: [{
+        category: ['Liebs Picker', 'Modal', 'Open Zoomed'],
+        id: 'ImagePicker.OpenZoomed',
+        name: 'Open in single image view',
+        type: 'boolean',
+        defaultValue: false,
+        tooltip: 'Modal will open directly to single image view',
+    },{
+        category: ['Liebs Picker', 'Selection', 'Selection Style'],
+        id: 'ImagePicker.PickerMode',
+        name: 'Default selection mode',
+        type: 'combo',
+        defaultValue: 'picker',
+        options: [
+            { text: 'Pass images', value: 'picker' },
+            { text: 'Filter images', value: 'filter' }
+        ],
+        attrs: {
+            editable: false,
+            filter: false
         },
-    ],
+        tooltip: 'Include or exclude selected images by default',
+    },{
+        category: ['Liebs Picker', 'Selection', 'Pass Requries Selection'],
+        id: 'ImagePicker.PickerModeMustPick',
+        name: 'Pass images mode requires a selection',
+        type: 'boolean',
+        defaultValue: true,
+        tooltip: 'Require an image to be selected in pass mode',
+    }],
     setup() {
         // Inject the styles for this extension.
         const el = document.createElement('link');
         el.setAttribute('rel', 'stylesheet');
         el.setAttribute('type', 'text/css');
-        el.setAttribute('href', new URL("./styles.css", import.meta.url).href);
+        el.setAttribute('href', new URL('./styles.css', import.meta.url).href);
         document.head.appendChild(el);
 
         // Add a listener for image picking.
-        api.addEventListener("liebs-picker-images", async (event) => { 
-            const detail = event.detail;
+        api.addEventListener('liebs-picker-images', async (event) => { 
+            const detail = event.detail,
+                extensionSettings = app.extensionManager.setting;
 
             if (pickerTabId !== detail.picker_tab_id) {
                 // Not the tab that ran the prompt.
@@ -58,10 +81,12 @@ app.registerExtension({
             // Show the modal.
             const modal = new GridModal({
                 title: detail.title,
-                imageList,                
+                imageList,
+                pickerMode: extensionSettings.get('ImagePicker.PickerMode'),
+                pickerModeMustPick: extensionSettings.get('ImagePicker.PickerModeMustPick')
             });
 
-            if (app.extensionManager.setting.get('ImagePicker.OpenZoomed')) {
+            if (extensionSettings.get('ImagePicker.OpenZoomed')) {
                 modal.switchToZoomModal(0);
             } else {
                 await modal.attach();
@@ -80,8 +105,8 @@ app.registerExtension({
                     body.append('selection', '');
                     break;
             };
-            api.fetchApi("/liebs-picker-message", { 
-                method: "POST", 
+            api.fetchApi('/liebs-picker-message', { 
+                method: 'POST', 
                 body 
             });
         });
@@ -126,7 +151,7 @@ app.registerExtension({
 })
 
 /**
- * We generate a unique ID for each tab running ComfyUI. This unique "picker tab ID" makes the messages from the prompt 
+ * We generate a unique ID for each tab running ComfyUI. This unique 'picker tab ID' makes the messages from the prompt 
  * server addressable to the tabs. The picker tab ID is stored in sessionStorage so it will persist even when the tab 
  * is refreshed. 
  * 

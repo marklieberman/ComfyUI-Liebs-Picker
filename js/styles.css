@@ -55,7 +55,8 @@ liebs-picker-zoom-modal header > div:last-child > div:not(:last-child) {
 
 liebs-picker-grid-modal header button,
 liebs-picker-zoom-modal header button {
-    width: 100px;
+    min-width: 100px;
+    max-width: 180px;
     height: 36px;
     vertical-align: center;
 }
@@ -192,13 +193,4 @@ liebs-picker-image .actions button {
     border: 2px solid transparent;
     border-radius: 4px;
     cursor: pointer;
-}
-
-liebs-picker-image .actions button:focus {
-    outline: none;
-    border: 2px solid #0cf;
-}
-
-liebs-picker-image .actions button:hover {    
-    color: #fff;
 }

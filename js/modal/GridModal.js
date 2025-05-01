@@ -39,7 +39,9 @@ export class GridModal extends BaseModal {
         this.handlerCancel = this.onCancel.bind(this);
         this.el.cancelButton.addEventListener('click', this.handlerCancel);
 
-        this.handlerImageSelect = this.onImageSelect.bind(this);
+        this.handlerImageListSelect = this.onImageListSelectOrUnwanted.bind(this);
+        this.handlerImageListUnwanted = this.onImageListSelectOrUnwanted.bind(this);        
+
         this.handlerImageClick = this.onImageClick.bind(this);
         this.handlerImageAction = this.onImageAction.bind(this);
         this.handlerImageMouseDown = this.onImageMouseDown.bind(this);        
@@ -48,7 +50,9 @@ export class GridModal extends BaseModal {
         this.handlerImageFocus = this.onImageFocus.bind(this);        
 
         // Initialize the modal controls.
-        this.mouseOverImage = null;        
+        this.mouseOverImage = null;
+        this.pickerMode = options.pickerMode ?? 'picker';
+        this.pickerModeMustPick = options.pickerModeMustPick ?? false;
         this.setTitle(options.title);
         this.setImageList(options.imageList);
         this.updateSendButton();
@@ -142,7 +146,16 @@ export class GridModal extends BaseModal {
             n = (n === 0) ? 9 : n - 1;
             if (n < this.imageList.length) {
                 handled = true;
-                this.imageList.toggleSelect(n);
+                switch (this.pickerMode) {
+                    case 'picker':
+                        this.imageList.toggleSelect(n);
+                        this.imageList.unwanted(n, false);
+                        break;
+                    case 'filter':
+                        this.imageList.select(n, false);
+                        this.imageList.toggleUnwanted(n);
+                        break;
+                }                
             }
         } else         
         // Cancel the modal with Escape.
@@ -189,16 +202,32 @@ export class GridModal extends BaseModal {
         // Select an image with E or /.
         if (letterKey === 'E' || letterKey === '/') {
             handled = true;            
-            const index = getFocusedIndex();    
-            this.imageList.toggleSelect(index);
-            this.imageList.unwanted(index, false);            
+            const index = getFocusedIndex();
+            switch (this.pickerMode) {
+                case 'picker':
+                    this.imageList.toggleSelect(index);
+                    this.imageList.unwanted(index, false);
+                    break;
+                case 'filter':
+                    this.imageList.select(index, false);
+                    this.imageList.toggleUnwanted(index);
+                    break;
+            }
         } else
         // Unwant an image with X or '.
         if (letterKey === 'X' || letterKey === '\'') {
             handled = true;
             const index = getFocusedIndex();            
-            this.imageList.select(index, false);
-            this.imageList.toggleUnwanted(index);
+            switch (this.pickerMode) {
+                case 'picker':
+                    this.imageList.select(index, false);
+                    this.imageList.toggleUnwanted(index);                    
+                    break;
+                case 'filter':
+                    this.imageList.toggleSelect(index);
+                    this.imageList.unwanted(index, false);
+                    break;
+            }
         }
         // Zoom an image with spacebar.
         if ((event.key === ' ')) {            
@@ -232,20 +261,26 @@ export class GridModal extends BaseModal {
     }
 
     // Update the label on the Send button.
-    updateSendButton(label) {
-        const selectedCount = this.imageList.selectedCount;
+    updateSendButton() {
+        const selectedCount = this.imageList.selectedCount,
+            wantedCount = this.imageList.wantedCount,
+            mustPick = (this.pickerMode === 'picker') && this.pickerModeMustPick;
 
-        this.el.sendButton.innerText = label ?? 
-            `Send (${selectedCount})`;
-
-        this.el.sendButton.disabled = selectedCount < 1;
+        if ((selectedCount > 0) || mustPick) {
+            this.el.sendButton.innerText = `Send (${selectedCount} selected)`;
+            this.el.sendButton.disabled = selectedCount < 1;
+        } else {
+            this.el.sendButton.innerText = `Send (${wantedCount} remaining)`;
+            this.el.sendButton.disabled = wantedCount < 1;
+        }
     }  
 
     // Set the list of images to display.
     setImageList(value) {
         this.imageList = value;
         this.lastFocusCoords = null;
-        value.addEventListener('image-select', this.handlerImageSelect);
+        value.addEventListener('image-select', this.handlerImageListSelect);
+        value.addEventListener('image-unwanted', this.handlerImageListUnwanted);
 
         // Populate the grid of images.
         this.el.imageList.innerText = '';
@@ -263,16 +298,25 @@ export class GridModal extends BaseModal {
         }
     }
 
-    // Invoked when the selection in the image list changes.
-    onImageSelect() {
+    // Invoked when the selection or unwanted flag in the image list changes.
+    onImageListSelectOrUnwanted() {
         this.updateSendButton();
     }
 
     // Invoked when an image is clicked.
     onImageClick(event) {
-        const detail = event.detail;        
-        this.imageList.toggleSelect(detail.index);
-        this.imageList.unwanted(detail.index, false)
+        const detail = event.detail;
+
+        switch (this.pickerMode) {
+            case 'picker':
+                this.imageList.toggleSelect(detail.index);
+                this.imageList.unwanted(detail.index, false);
+                break;
+            case 'filter':
+                this.imageList.select(detail.index, false);
+                this.imageList.toggleUnwanted(detail.index);
+                break;
+        }
         
         // Reset focus back to the modal to avoid focus outlines on the images when not using keyboard.
         this.focus();
@@ -280,10 +324,17 @@ export class GridModal extends BaseModal {
 
     // Invoked when an action button is clicked on an image.
     onImageAction(event) {
-        const detail = event.detail;            
-        if (detail.action === 'unwanted') {
-            this.imageList.select(detail.index, false);
-            this.imageList.toggleUnwanted(detail.index);
+        const detail = event.detail;   
+                 
+        switch (detail.action) {
+            case 'select':
+                this.imageList.toggleSelect(detail.index);
+                this.imageList.unwanted(detail.index, false);
+                break;
+            case 'unwanted':
+                this.imageList.select(detail.index, false);
+                this.imageList.toggleUnwanted(detail.index);
+                break;            
         }
     }
 
@@ -348,6 +399,8 @@ export class GridModal extends BaseModal {
     async switchToZoomModal(index) {
         const zoomModal = new ZoomModal({
             title: this.title,
+            pickerMode: this.pickerMode,
+            pickerModeMustPick: this.pickerModeMustPick,
             imageList: this.imageList,
             index
         });
