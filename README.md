@@ -8,19 +8,39 @@ A node to pause execution of the workflow and select which input images should p
 
 * Switch between a grid view and a single image view.
 
-* Modal only displays in the browser tab that was running the workflow.
+* _Pass images_ selection mode to select desired images and send them through.
 
+* _Filter images_ selection mode to flag unwanted images and send remaining images.
+
+* Modal can be operated with only keyboard (WASD or Arrow) or only mouse controls.
+
+* Modal only displays in the browser tab that was running the workflow.
 
 | Workflow example | Grid view | Single image view |
 |----|----|----|
 | ![Example workflow with the node](./docs/images/workflow.png) | ![Screenshot of the grid view](./docs/images/grid-modal.png) | ![Screenshot of the single image view](./docs/images/zoom-modal.png) |
 | The node accepts a list of images and returns a filtered list of images. | Images are displayed in a grid for selection. | Single image mode allows you to view each image using all available space. |
+|
+| **Filter mode to flag unwanted images** | **Pass mode with unwanted images** | **Settings panel** |
+| ![Grid view with excluded images](./docs/images/filter-mode.png) | ![Grid view with selected and excluded images](./docs/images/picker-filter.png) | ![Settings panel for the node](./docs/images/settings.png) |
+| Filter mode to flag unwanted images and pass the remaining images. | Pass mode with unwanted images on a large batch. | The modal behaviour and default selection mode is configurable. |
+|
+| **Mouse-over controls on each image** |
+| ![Buttons on the top left of the image](./docs/images/image-buttons.png) | 
+| Button controls will appear on each image when the mouse hovers in on the top-right corner. |
+
 
 ## Controls
 
-* Middle-click or spacebar toggles between grid view and single image view.
+* Middle-click or Spacebar toggles between grid view and single image view.
 
 * E, forward-slash /, or left-click to select or deselect images.
+
+* X or single-quote ' to flag unwanted images.
+
+* _Filter image_ mode: the select action (E,/,click) is swapped with flag unwanted action (X,').
+
+* Mouse-over the top-right of an image to reveal button controls.
 
 * Enter to proceed with selection, or Escape to cancel workflow.
 
@@ -32,7 +52,7 @@ A node to pause execution of the workflow and select which input images should p
 
 ### Single image view
 
-* Mouse-wheel, left and right arrow keys, or AD keys to navigate between images in single image view.
+* Mouse-wheel, Left/Right arrow keys, or AD keys to navigate between images in single image view.
 
 ## Credits
 
