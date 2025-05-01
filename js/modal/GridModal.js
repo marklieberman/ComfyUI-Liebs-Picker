@@ -202,7 +202,7 @@ export class GridModal extends BaseModal {
         // Select an image with E or /.
         if (letterKey === 'E' || letterKey === '/') {
             handled = true;            
-            const index = getFocusedIndex();
+            const index = getFocusedIndex() ?? 0;
             switch (this.pickerMode) {
                 case 'picker':
                     this.imageList.toggleSelect(index);
@@ -217,7 +217,7 @@ export class GridModal extends BaseModal {
         // Unwant an image with X or '.
         if (letterKey === 'X' || letterKey === '\'') {
             handled = true;
-            const index = getFocusedIndex();            
+            const index = getFocusedIndex() ?? 0;            
             switch (this.pickerMode) {
                 case 'picker':
                     this.imageList.select(index, false);
