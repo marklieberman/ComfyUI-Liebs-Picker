@@ -31,8 +31,13 @@ app.registerExtension({
         category: ['Liebs Picker', 'Modal', 'Open Zoomed'],
         id: 'ImagePicker.OpenZoomed',
         name: 'Open in single image view',
-        type: 'boolean',
-        defaultValue: false,
+        type: 'combo',
+        defaultValue: 'never',
+        options: [
+            { text: 'Never', value: 'never' },
+            { text: 'Always', value: 'always' },
+            { text: 'On single image', value: 'single' }
+        ],
         tooltip: 'Modal will open directly to single image view',
     },{
         category: ['Liebs Picker', 'Selection', 'Selection Style'],
@@ -86,7 +91,11 @@ app.registerExtension({
                 pickerModeMustPick: extensionSettings.get('ImagePicker.PickerModeMustPick')
             });
 
-            if (extensionSettings.get('ImagePicker.OpenZoomed')) {
+            const openZoomed = extensionSettings.get('ImagePicker.OpenZoomed'),
+                alwaysZoom = (openZoomed === 'always'),
+                singleImageZoom = (openZoomed === 'single') && (imageList.length === 1);
+                
+            if (alwaysZoom || singleImageZoom) {
                 modal.switchToZoomModal(0);
             } else {
                 await modal.attach();
