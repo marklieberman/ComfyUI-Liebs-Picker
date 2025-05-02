@@ -8,28 +8,23 @@ A node to pause execution of the workflow and select which input images should p
 
 * Switch between a grid view and a single image view.
 
-* _Pass images_ selection mode to select desired images and send them through.
+* **Pass images** selection mode to select desired images and send them through.
 
-* _Filter images_ selection mode to flag unwanted images and send remaining images.
+* **Filter images** selection mode to flag unwanted images and send remaining images.
 
 * Modal can be operated with only keyboard (WASD or Arrow) or only mouse controls.
 
 * Modal only displays in the browser tab that was running the workflow.
 
-| Grid view | Single image view |
-| :----: | :----: |
-| ![Screenshot of the grid view](./docs/images/grid-modal.png) | ![Screenshot of the single image view](./docs/images/zoom-modal.png) |
-| Images are displayed in a grid for selection. | Single image mode allows you to view each image using all available space. |
-
-| Filter mode to flag unwanted images | Pass mode with unwanted images |
-| :----: | :----: |
-| ![Grid view with excluded images](./docs/images/filter-mode.png) | ![Grid view with selected and excluded images](./docs/images/picker-filter.png) |
-| Filter mode to flag unwanted images and pass the remaining images. | Pass mode with unwanted images on a large batch. |
-
-| Workflow example | Settings panel |
-| :----: | :----: |
-| ![Example workflow with the node](./docs/images/workflow.png) | ![Settings panel for the node](./docs/images/settings.png) |
-| The node accepts a list of images and returns a filtered list of images. | The modal behaviour and default selection mode are configurable. |
+| Screenshot | Description |
+| :---- | :---- |
+| <img src="./docs/images/workflow.png" width="300" height="228"/> | The node accepts a list of images and returns a filtered list of images. When the node runs, execution will pause and an image picker dialog will be displayed.
+| <img src="./docs/images/grid-modal.png" width="300" height="200"/> | Images are displayed in a grid for selection. |
+| <img src="./docs/images/zoom-modal.png" width="300" height="200"/> | Single image mode allows you to view each image using all available space. |
+| <img src="./docs/images/filter-mode.png" width="300" height="200"/> | **Pass images** mode is a positive selection where you pick specific images to pass through. **Filter images** mode is a negative selection where you pick specific images to discard. | 
+| <img src="./docs/images/picker-filter.png" width="300" height="200"/> | You can flag both wanted and unwanted images at the same time to help you process a large batch. |
+| <img src="./docs/images/image-buttons.png" width="300" height="152"/> | Hidden buttons appear when the mouse cursor hovers over the top-right of an image. |
+| <img src="./docs/images/settings.png" width="300" height="174"/> | The modal behaviour and default selection mode are configurable. |
 
 ## Controls
 
@@ -39,7 +34,7 @@ A node to pause execution of the workflow and select which input images should p
 
 * X or single-quote ' to flag unwanted images.
 
-* _Filter image_ mode: the select action (E,/,click) is swapped with flag unwanted action (X,').
+* **Filter images** mode: the select action (E,/,click) is swapped with flag unwanted action (X,').
 
 * [Mouse-over the top-right of an image to reveal button controls](./docs/images/image-buttons.png).
 
@@ -58,3 +53,13 @@ A node to pause execution of the workflow and select which input images should p
 ## Credits
 
 This node was developed using the techniques from [cg-image-filter](https://github.com/chrisgoringe/cg-image-filter) by @chrisgoringe.
+
+## Changelog
+
+__Unreleased__
+
+* Added **filter images** mode.
+
+__1.0.0__
+
+* Intial release
