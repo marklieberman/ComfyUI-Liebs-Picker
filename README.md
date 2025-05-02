@@ -1,6 +1,6 @@
 # ComfyUI-Liebs-Picker
 
-A node to pause execution of the workflow and select which input images should proceed to the output.
+A node to pause execution of the workflow and select which input images should proceed to the output. Pairs well with [ComfyUI-Liebs-Picker](https://github.com/marklieberman/ComfyUI-Liebs-Picker) to get a toast notification when the picker is available.
 
 ## Features
 
