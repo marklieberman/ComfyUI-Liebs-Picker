@@ -18,13 +18,13 @@ A node to pause execution of the workflow and select which input images should p
 
 | Screenshot | Description |
 | :---- | :---- |
-| <img src="./docs/images/workflow.png" width="300" height="228"/> | The node accepts a list of images and returns a filtered list of images. When the node runs, execution will pause and an image picker dialog will be displayed.
-| <img src="./docs/images/grid-modal.png" width="300" height="200"/> | Images are displayed in a grid for selection. |
-| <img src="./docs/images/zoom-modal.png" width="300" height="200"/> | Single image mode allows you to view each image using all available space. |
-| <img src="./docs/images/filter-mode.png" width="300" height="200"/> | **Pass images** mode is a positive selection where you pick specific images to pass through. **Filter images** mode is a negative selection where you pick specific images to discard. | 
-| <img src="./docs/images/picker-filter.png" width="300" height="200"/> | You can flag both wanted and unwanted images at the same time to help you process a large batch. |
-| <img src="./docs/images/image-buttons.png" width="300" height="152"/> | Hidden buttons appear when the mouse cursor hovers over the top-right of an image. |
-| <img src="./docs/images/settings.png" width="300" height="174"/> | The modal behaviour and default selection mode are configurable. |
+| <img src="./docs/images/workflow.png" width="500"/> | The node accepts a list of images and returns a filtered list of images. When the node runs, execution will pause and an image picker dialog will be displayed.
+| <img src="./docs/images/grid-modal.png" width="500"/> | Images are displayed in a grid for selection. |
+| <img src="./docs/images/zoom-modal.png" width="500"/> | Single image mode allows you to view each image using all available space. |
+| <img src="./docs/images/filter-mode.png" width="500"/> | **Pass images** mode is a positive selection where you pick specific images to pass through. **Filter images** mode is a negative selection where you pick specific images to discard. | 
+| <img src="./docs/images/picker-filter.png" width="500"/> | You can flag both wanted and unwanted images at the same time to help you process a large batch. |
+| <img src="./docs/images/image-buttons.png" width="500"/> | Hidden buttons appear when the mouse cursor hovers over the top-right of an image. |
+| <img src="./docs/images/settings.png" width="500"/> | The modal behaviour and default selection mode are configurable. |
 
 ## Controls
 
