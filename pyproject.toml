@@ -1,7 +1,7 @@
 [project]
 name = "liebs-picker"
 description = "A node to pause execution of the workflow and select which input images should proceed to the output."
-version = "1.0.0"
+version = "1.1.0"
 license = {file = "LICENSE"}
 
 [project.urls]

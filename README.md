@@ -56,7 +56,7 @@ This node was developed using the techniques from [cg-image-filter](https://gith
 
 ## Changelog
 
-__Unreleased__
+__1.1.0__
 
 * Added **filter images** mode.
 
