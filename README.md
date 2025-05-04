@@ -16,9 +16,11 @@ A node to pause execution of the workflow and select which input images should p
 
 * Modal only displays in the browser tab that was running the workflow.
 
+### Screenshots
+
 | Screenshot | Description |
 | :---- | :---- |
-| <img src="./docs/images/workflow.png" width="500"/> | The node accepts a list of images and returns a filtered list of images. When the node runs, execution will pause and an image picker dialog will be displayed.
+| <img src="./docs/images/workflow.png" width="500"/> | The node accepts a batch of images and returns a filtered batch of images. When the node runs, execution will pause and an image picker dialog will be displayed.
 | <img src="./docs/images/grid-modal.png" width="500"/> | Images are displayed in a grid for selection. |
 | <img src="./docs/images/zoom-modal.png" width="500"/> | Single image mode allows you to view each image using all available space. |
 | <img src="./docs/images/filter-mode.png" width="500"/> | **Pass images** mode is a positive selection where you pick specific images to pass through. **Filter images** mode is a negative selection where you pick specific images to discard. | 
