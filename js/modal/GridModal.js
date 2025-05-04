@@ -3,7 +3,7 @@ import { ImageListImageElement } from "../ImageListImageElement.js";
 import { ZoomModal } from "./ZoomModal.js";
 
 const MODAL_HTML = `
-    <header class="not-zoomed">
+    <header>
         <h1>Image Picker</h1>
         <div class="p-component">
             <button class="p-button p-button-secondary cancel-button">Cancel</button>
