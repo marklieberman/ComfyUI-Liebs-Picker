@@ -11,4 +11,4 @@ Repository = "https://github.com/marklieberman/ComfyUI-Liebs-Picker"
 [tool.comfy]
 PublisherId = "markliebs"
 DisplayName = "ComfyUI-Liebs-Picker"
-Icon = ""
+Icon = "https://raw.githubusercontent.com/marklieberman/ComfyUI-Liebs-Picker/refs/heads/main/comfy-icon.png"
