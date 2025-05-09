@@ -5,15 +5,10 @@ A node to pause execution of the workflow and select which input images should p
 ## Features
 
 * Display a modal dialog with the images to select.
-
 * Switch between a grid view and a single image view.
-
 * **Pass images** selection mode to select desired images and send them through.
-
 * **Filter images** selection mode to flag unwanted images and send remaining images.
-
 * Modal can be operated with only keyboard (WASD or Arrow) or only mouse controls.
-
 * Modal only displays in the browser tab that was running the workflow.
 
 ### Screenshots
@@ -31,21 +26,15 @@ A node to pause execution of the workflow and select which input images should p
 ## Controls
 
 * Middle-click or Spacebar toggles between grid view and single image view.
-
 * E, forward-slash /, or left-click to select or deselect images.
-
 * X or single-quote ' to flag unwanted images.
-
 * **Filter images** mode: the select action (E,/,click) is swapped with flag unwanted action (X,').
-
-* [Mouse-over the top-right of an image to reveal button controls](./docs/images/image-buttons.png).
-
+* Mouse-over the top-right of an image to reveal button controls.
 * Enter to proceed with selection, or Escape to cancel workflow.
 
 ### Grid view
 
 * Arrows keys or WASD to nagivate between images in the grid view.
-
 * Toggle selected images with number keys 1-9 and 0.
 
 ### Single image view
