@@ -10,6 +10,7 @@ A node to pause execution of the workflow and select which input images should p
 * **Filter images** selection mode to flag unwanted images and send remaining images.
 * Modal can be operated with only keyboard (WASD or Arrow) or only mouse controls.
 * Modal only displays in the browser tab that was running the workflow.
+* Accepts images lists with different sized images. 
 
 ### Screenshots
 
@@ -46,6 +47,10 @@ A node to pause execution of the workflow and select which input images should p
 This node was developed using the techniques from [cg-image-filter](https://github.com/chrisgoringe/cg-image-filter) by @chrisgoringe.
 
 ## Changelog
+
+__1.1.1__
+
+* Accept images lists with different sized images. ([#5](https://github.com/marklieberman/ComfyUI-Liebs-Picker/pull/5) by zopieux)
 
 __1.1.0__
 
