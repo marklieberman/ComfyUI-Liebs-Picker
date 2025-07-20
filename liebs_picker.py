@@ -37,8 +37,10 @@ class LiebsPicker(PreviewImage):
             }
         }
 
-    RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("IMAGES",)
+    INPUT_IS_LIST = True
+    OUTPUT_IS_LIST = (False, True,)
+    RETURN_TYPES = ("IMAGE", "IMAGE",)
+    RETURN_NAMES = ("IMAGES", "IMAGES",)
     FUNCTION = "func"
     CATEGORY = "image_filter"
     OUTPUT_NODE = False
@@ -47,8 +49,25 @@ class LiebsPicker(PreviewImage):
         return float("NaN")
 
     def func(self, images, picker_tab_id, title, unique_id):
+        assert len(picker_tab_id) == 1
+        assert len(title) == 1
+        assert len(unique_id) == 1
+
+        picker_tab_id = picker_tab_id[0]
+        title = title[0]
+        unique_id = unique_id[0]
+
         # Use PreviewImage to save images to temp directory.
-        urls:list[str] = self.save_images(images=images)['ui']['images']
+        urls: list[str] = [
+            url
+            for group in images
+            for url in self.save_images(images=group)['ui']['images']
+        ]
+        images = [
+            image
+            for group in images
+            for image in group
+        ]
 
         # Prepare a slot to receive a message.
         mailbox[picker_tab_id] = None
@@ -75,7 +94,12 @@ class LiebsPicker(PreviewImage):
             raise InterruptProcessingException()
 
         selection = [int(x) for x in res["selection"].split(",") if x]
-        images = torch.stack(list(images[i] for i in selection))
+        images = [images[i] for i in selection]
+        try:
+            as_stack = torch.stack(images)
+        except RuntimeError:
+            # Best effort.
+            as_stack = torch.stack(images[:1])
 
-        return (images,)
-
+        as_list = [torch.stack([image]) for image in images]
+        return (as_stack, as_list,)
