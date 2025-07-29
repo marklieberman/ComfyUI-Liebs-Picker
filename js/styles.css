@@ -1,5 +1,4 @@
-liebs-picker-grid-modal,
-liebs-picker-zoom-modal {
+.liebs-picker-modal {
     position: absolute;
     top: 0px;
     left: 0px;
@@ -15,24 +14,25 @@ liebs-picker-zoom-modal {
     flex-flow: column nowrap;
 }
 
-liebs-picker-grid-modal:focus,
-liebs-picker-zoom-modal:focus {
+.liebs-picker-modal:focus {
     outline: none;
 }
 
-liebs-picker-grid-modal header,
-liebs-picker-zoom-modal header {
+.liebs-picker-modal header {
     width: 100%;
     margin-bottom: 20px;
 
     display: flex;
     flex-flow: row wrap;
-    justify-content: space-between;
     align-items: center;
+    gap: 10px 40px;
 }
 
-liebs-picker-grid-modal h1,
-liebs-picker-zoom-modal h1 {
+.liebs-picker-modal .spacer {
+    flex-grow: 1;
+}
+
+.liebs-picker-modal h1 {
     font-size: 16px;
     flex-grow: 0;
 }
@@ -44,31 +44,28 @@ liebs-picker-zoom-modal h1 + span {
     flex-grow: 1;
 }
 
-liebs-picker-zoom-modal header > div:last-child {
-    display: flex;
-    flex-flow: row wrap;
-}
-
-liebs-picker-zoom-modal header > div:last-child > div:not(:last-child) {
-    margin-right: 40px;
-}
-
-liebs-picker-grid-modal header button,
-liebs-picker-zoom-modal header button {
+.liebs-picker-modal header button {
     min-width: 100px;
     max-width: 180px;
     height: 36px;
-    vertical-align: center;
 }
 
-liebs-picker-grid-modal header button:disabled,
-liebs-picker-zoom-modal header button:disabled {
+.liebs-picker-modal header .toggle-switch {
+    height: 36px;
+    display: flex;
+    align-items: center;    
+}
+
+.liebs-picker-modal header .toggle-switch label {
+    margin-left:5px
+}
+
+.liebs-picker-modal header button:disabled {
     opacity: var(--p-disabled-opacity);
     cursor: not-allowed;
 }
 
-liebs-picker-grid-modal content,
-liebs-picker-zoom-modal content {
+.liebs-picker-modal content {
     width: 100%;
     max-width: 100%;
     height: 100%;
@@ -80,8 +77,7 @@ liebs-picker-zoom-modal content {
     align-items: center;
 }
 
-liebs-picker-grid-modal.first-layout content,
-liebs-picker-zoom-modal.first-layout content {
+.liebs-picker-modal.first-layout content {
     opacity: 0;
 }
 
@@ -193,4 +189,116 @@ liebs-picker-image .actions button {
     border: 2px solid transparent;
     border-radius: 4px;
     cursor: pointer;
+}
+
+liebs-picker-image .bboxes {
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+
+    pointer-events: none;
+}
+
+liebs-picker-bbox {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    bottom:100px;
+    right: 100px;
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+
+    color: #0F0;
+    background-color: rgba(0,128,0,0.2);
+    border-radius: 8px;
+    border: 2px solid #008000;
+    text-align: center;
+    
+    pointer-events: all;
+    user-select: none;
+}
+
+liebs-picker-bbox > .label {
+    position: relative;
+    top: -24px;
+    white-space: nowrap;
+    background-color: rgba(0,128,0,0.8);    
+}
+
+liebs-picker-bbox:hover {
+    background-color: rgba(128,255,128,0.3);    
+}
+
+.liebs-picker-modal:not(.segs-controls) .segs-control {
+    display: none;
+}
+
+.liebs-picker-modal .hide-segments liebs-picker-bbox-overlay {
+    display: none;
+}
+
+/* 
+CSS switch by TimTrayler.
+https://uiverse.io/TimTrayler/quiet-swan-35
+*/
+
+.liebs-picker-modal .switch {
+    --secondary-container: #3a4b39;
+    --primary: #84da89;
+    font-size: 17px;
+    position: relative;
+    display: inline-block;
+    width: 3.7em;
+    height: 1.8em;
+}
+
+.liebs-picker-modal .switch input {
+    display: none;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.liebs-picker-modal .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #313033;
+    transition: .2s;
+    border-radius: 30px;
+}
+
+.liebs-picker-modal .slider:before {
+    position: absolute;
+    content: "";
+    height: 1.4em;
+    width: 1.4em;
+    border-radius: 20px;
+    left: 0.2em;
+    bottom: 0.2em;
+    background-color: #aeaaae;
+    transition: .4s;
+}
+
+.liebs-picker-modal input:checked + .slider::before {
+    background-color: var(--primary);
+}
+
+.liebs-picker-modal input:checked + .slider {
+    background-color: var(--secondary-container);
+}
+
+.liebs-picker-modal input:focus + .slider {
+    box-shadow: 0 0 1px var(--secondary-container);
+}
+
+.liebs-picker-modal input:checked + .slider:before {
+    transform: translateX(1.9em);
 }

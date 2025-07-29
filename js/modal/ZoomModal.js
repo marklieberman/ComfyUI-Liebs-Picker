@@ -4,36 +4,42 @@ export const MODAL_HTML = `
     <header>
         <h1>Image Picker</h1>
         <span>? of ?</span>
-        <div>
-            <div class="p-component">
-                <button class="p-button p-button-secondary cancel-button">
-                    <span class="p-button-label">Cancel</span>
-                </button>
-                <button class="p-button p-button-secondary back-button">
-                    <span class="p-button-label">Back</span>
-                </button>
-                <button class="p-button p-button-primary send-button">
-                    <span class="p-button-label">Send</span>
-                </button>
-                
-            </div>
-            <div class="p-component">
-                <button class="p-button p-button-secondary first-button">
-                    <span class="p-button-icon pi pi-step-backward"></span>
-                </button>
-                <button class="p-button p-button-secondary prev-button">
-                    <span class="p-button-icon pi pi-play"></span>
-                </button>
-                <button class="p-button p-button-secondary next-button">
-                    <span class="p-button-icon pi pi-play"></span>
-                </button>
-                <button class="p-button p-button-secondary last-button">
-                    <span class="p-button-icon pi pi-step-forward"></span>
-                </button>
-            </div>
+        <div class="spacer"></div>
+        <div class="p-component toggle-switch segs-control segs-switch">
+            SEGS
+            <label class="switch">
+                <input type="checkbox">
+                <span class="slider"></span>                
+            </label>            
+        </div>
+        <div class="p-component">
+            <button class="p-button p-button-secondary cancel-button">
+                <span class="p-button-label">Cancel</span>
+            </button>
+            <button class="p-button p-button-secondary back-button">
+                <span class="p-button-label">Back</span>
+            </button>
+            <button class="p-button p-button-primary send-button">
+                <span class="p-button-label">Send</span>
+            </button>
+            
+        </div>
+        <div class="p-component">
+            <button class="p-button p-button-secondary first-button">
+                <span class="p-button-icon pi pi-step-backward"></span>
+            </button>
+            <button class="p-button p-button-secondary prev-button">
+                <span class="p-button-icon pi pi-play"></span>
+            </button>
+            <button class="p-button p-button-secondary next-button">
+                <span class="p-button-icon pi pi-play"></span>
+            </button>
+            <button class="p-button p-button-secondary last-button">
+                <span class="p-button-icon pi pi-step-forward"></span>
+            </button>
         </div>
     </header>
-    <content>
+    <content class="hide-segments">
         <liebs-picker-image></liebs-picker-image>
     </content>
 `;
@@ -53,6 +59,7 @@ export class ZoomModal extends BaseModal {
         this.el = {
             title: this.querySelector('header h1'),
             subtitle: this.querySelector('header span'),
+            segsCheckbox: this.querySelector('.segs-switch input'),
             cancelButton: this.querySelector('.cancel-button'),            
             sendButton: this.querySelector('.send-button'),
             backButton: this.querySelector('.back-button'),
@@ -94,15 +101,28 @@ export class ZoomModal extends BaseModal {
         this.handlerImageAction = this.onImageAction.bind(this);
         this.el.image.addEventListener('image-action', this.handlerImageAction);
         this.handlerImageMousedown = this.onImageMousedown.bind(this);
-        this.el.image.addEventListener('image-mousedown', this.handlerImageMousedown);        
+        this.el.image.addEventListener('image-mousedown', this.handlerImageMousedown);    
+        
+        this.el.segsCheckbox.addEventListener('click', () => {
+            this.displaySegments(this.el.segsCheckbox.checked);
+        });
 
         // Initialize the modal controls.
         this.pickerMode = options.pickerMode ?? 'picker';
         this.pickerModeMustPick = options.pickerModeMustPick ?? false;
         this.setImageList(options.imageList, options.index);
         this.setTitle(options.title);
-        this.setSubtitle();
+        this.setSubtitle();        
         this.updateSendButton();
+
+        // Display SEGS controls when features are enabled.
+        this.segsControls = options.segsControls ?? false;
+        if (this.segsControls) {
+            this.classList.add("segs-controls");
+            this.displaySegments(options.showSegments ?? true);
+        } else {
+            this.displaySegments(false);
+        }
     }
 
     // Prepare a grid style layout.
@@ -139,6 +159,15 @@ export class ZoomModal extends BaseModal {
 
         const letterKey = event.key.toUpperCase();
 
+        let n = parseInt(event.key);
+        if (Number.isInteger(n)) {
+            n = (n === 0) ? 9 : n - 1;
+            if (this.segsControls && event.altKey && this.isSegmentsVisible()) {
+                // Cycle segment labels of the Nth segment of the focused image when alt-key is pressed.
+                const index = this.el.image.index;
+                this.el.image.imageList.getImageSegments(index)?.nextLabel(n);
+            }
+        } else         
         // Back to grid view with spacebar.
         if (event.key === ' ') {
             handled = true;
@@ -202,6 +231,10 @@ export class ZoomModal extends BaseModal {
                     imageList.toggleSelect(index);
                     break;
             }
+        } else 
+        // Toggle visibility of the segments overlay.
+        if (this.segsControls && (event.key === '`') && event.altKey) {
+            this.displaySegments(!this.isSegmentsVisible());
         }
 
         if (handled) {
@@ -253,9 +286,26 @@ export class ZoomModal extends BaseModal {
         value.addEventListener('image-unwanted', this.handlerImageListUnwanted);
     }
 
+    // Set the index of the image to display from the image list.
     setIndex(value) {
         this.el.image.setIndex(value);
     }
+
+    // True if segments overlay is visible, otherwise false.
+    isSegmentsVisible() {
+        return !this.el.content.classList.contains('hide-segments');
+    }
+
+    // Set visibility of the segments overlay.
+    displaySegments(value) {
+        this.showSegments = value;
+        this.el.segsCheckbox.checked = value;
+        if (value) {
+            this.el.content.classList.remove('hide-segments');
+        } else {
+            this.el.content.classList.add('hide-segments');
+        }
+    }    
 
     // Invoked when the image index in the image list is changed.
     onImageIndex(event) {

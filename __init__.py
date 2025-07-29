@@ -1,11 +1,13 @@
-from .liebs_picker import LiebsPicker
+from .liebs_picker import LiebsPickerBasic, LiebsPickerSEGS
 
 NODE_CLASS_MAPPINGS = {
-    "LiebsPicker": LiebsPicker,
+    "LiebsPicker": LiebsPickerBasic,
+    "LiebsPickerSEGS": LiebsPickerSEGS,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "LiebsPicker": "Image Picker",
+    "LiebsPickerSEGS": "Image Picker (SEGS)",
 }
 
 WEB_DIRECTORY = "./js"

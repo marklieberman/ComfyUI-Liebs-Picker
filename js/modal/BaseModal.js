@@ -23,6 +23,7 @@ export class BaseModal extends HTMLElement {
         this.addEventListener('keydown', this.handlerKeyDown);
 
         // Allows the modal element to recieve focus.
+        this.classList.add('liebs-picker-modal');
         this.setAttribute('tabindex', '0');
     }
 

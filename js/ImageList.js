@@ -1,20 +1,24 @@
 import { api } from "../../scripts/api.js";
+import { Segments } from "./Segments.js";
 
 /**
  * A list of images to display and their selected state.
  */
 export class ImageList extends EventTarget {
     
-    constructor(comfyUrls) {
+    constructor(imageList) {
         super();
 
-        this.items = [];        
-        for (const url of comfyUrls) {
-            this.items.push({
-                url,
+        this.items = [];
+        for (let i = 0; i < imageList.length; i++) {
+            let item = {
+                url: imageList[i].url,
+                segments: new Segments(imageList[i].segments),
                 selected: false,
                 unwanted: false
-            })
+            };
+
+            this.items.push(item);
         }
     }
 
@@ -110,4 +114,30 @@ export class ImageList extends EventTarget {
         this.unwanted(index, unwanted);
         return unwanted;
     }
+
+    // -------------------------------------------------------------------------
+    // Segments
+
+    // Get the segment information for the image at index.
+    getImageSegments(index) {
+        return this.items[index].segments;
+    }
+
+    // -------------------------------------------------------------------------
+
+    getResult() {
+        const result = []
+        for (const [i, item] of Object.entries(this.items)) {
+            if (item.selected) {
+                result.push({
+                    index: Number(i),
+                    segments: {
+                        label: item.segments.label
+                    }
+                })
+            }
+        }
+        return result;
+    }
+
 }

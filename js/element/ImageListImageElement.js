@@ -1,3 +1,5 @@
+import { BBoxOverlayElement } from "./BBoxOverlayElement.js";
+
 const ELEMENT_HTML = `
     <img>
     <div class="overlay"></div>
@@ -29,7 +31,8 @@ export class ImageListImageElement extends HTMLElement {
         this.el = {
             image: this.querySelector('img'),
             selectButton: this.querySelector('.select'),
-            unwantedButton: this.querySelector('.unwanted')
+            unwantedButton: this.querySelector('.unwanted'),
+            segmentsOverlay: null
         };
 
         // Create event handlers for this instance.
@@ -59,8 +62,23 @@ export class ImageListImageElement extends HTMLElement {
         if (this.index !== value)  {
             this.index = value;
             this.el.image.src = this.imageList.getImageUrl(value);
-            this.updateAttributes();
             
+            this.updateAttributes();
+
+            // Add a segments overlay if the iamge has segment data.
+            const segments = this.imageList.getImageSegments(value);
+            if (segments) {
+                if (!this.el.segmentsOverlay) {
+                    this.el.segmentsOverlay = new BBoxOverlayElement();
+                    this.appendChild(this.el.segmentsOverlay);
+                }
+                this.el.segmentsOverlay.setSegments(segments);
+            } else {
+                // Image data does have segments.
+                this.removeChild(this.el.segmentsOverlay);
+                this.el.segmentsOverlay = null;
+            }
+           
             this.dispatchEvent(new CustomEvent('image-index', {
                 detail: {
                     imageList: this.imageList,
