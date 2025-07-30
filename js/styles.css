@@ -191,14 +191,8 @@ liebs-picker-image .actions button {
     cursor: pointer;
 }
 
-liebs-picker-image .bboxes {
-    position: absolute;
-    top: 0%;
-    left: 0%;
-    width: 100%;
-    height: 100%;
-
-    pointer-events: none;
+.picker-locked liebs-picker-image .actions {
+    display: none;
 }
 
 liebs-picker-bbox {
@@ -222,15 +216,19 @@ liebs-picker-bbox {
     user-select: none;
 }
 
+liebs-picker-bbox:hover {
+    background-color: rgba(128,255,128,0.3);    
+}
+
+liebs-picker-image[data-unwanted="yes"] liebs-picker-bbox {
+    opacity: 0.1
+}
+
 liebs-picker-bbox > .label {
     position: relative;
     top: -24px;
     white-space: nowrap;
     background-color: rgba(0,128,0,0.8);    
-}
-
-liebs-picker-bbox:hover {
-    background-color: rgba(128,255,128,0.3);    
 }
 
 .liebs-picker-modal:not(.segs-controls) .segs-control {

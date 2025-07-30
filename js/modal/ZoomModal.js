@@ -110,9 +110,16 @@ export class ZoomModal extends BaseModal {
         // Initialize the modal controls.
         this.pickerMode = options.pickerMode ?? 'picker';
         this.pickerModeMustPick = options.pickerModeMustPick ?? false;
+        this.pickerLocked = options.pickerLocked ?? false;
         this.setImageList(options.imageList, options.index);
         this.setTitle(options.title);
         this.setSubtitle();        
+
+        if (this.pickerLocked) {
+            this.classList.add("picker-locked");
+            this.pickerModeMustPick = false;
+        }
+
         this.updateSendButton();
 
         // Display SEGS controls when features are enabled.
@@ -201,7 +208,7 @@ export class ZoomModal extends BaseModal {
             this.onLast();
         } else
         // Select an image with E or /.
-        if (letterKey === 'E' || letterKey === '/') {
+        if (!this.pickerLocked && (letterKey === 'E' || letterKey === '/')) {
             handled = true;
             const imageList = this.el.image.imageList,
                 index = this.el.image.index;
@@ -217,7 +224,7 @@ export class ZoomModal extends BaseModal {
             }
         } else
         // Unwant an image with X.
-        if (letterKey === 'X' || letterKey === '\'') {
+        if (!this.pickerLocked && (letterKey === 'X' || letterKey === '\'')) {
             handled = true;
             const imageList = this.el.image.imageList,
                 index = this.el.image.index;                
@@ -271,11 +278,15 @@ export class ZoomModal extends BaseModal {
             mustPick = (this.pickerMode === 'picker') && this.pickerModeMustPick;
 
         if ((selectedCount > 0) || mustPick) {
-            this.el.sendButton.innerText = `Send (${selectedCount} selected)`;
             this.el.sendButton.disabled = selectedCount < 1;
+            this.el.sendButton.innerText = `Send (${selectedCount} selected)`;
         } else {
-            this.el.sendButton.innerText = `Send (${wantedCount} remaining)`;
             this.el.sendButton.disabled = wantedCount < 1;
+            if (this.pickerLocked) {
+                this.el.sendButton.innerText = `Send (${wantedCount} selected)`;
+            } else {
+                this.el.sendButton.innerText = `Send (${wantedCount} remaining)`;
+            }
         }
     }  
 
@@ -327,16 +338,18 @@ export class ZoomModal extends BaseModal {
         const detail = event.detail,
             imageList = this.el.image.imageList;
 
-        switch (this.pickerMode) {
-            case 'picker':
-                imageList.unwanted(detail.index, false);
-                imageList.toggleSelect(detail.index);
-                break;
-            case 'filter':
-                imageList.select(detail.index, false);
-                imageList.toggleUnwanted(detail.index);
-                break;
-        }        
+        if (!this.pickerLocked) {
+            switch (this.pickerMode) {
+                case 'picker':
+                    imageList.unwanted(detail.index, false);
+                    imageList.toggleSelect(detail.index);
+                    break;
+                case 'filter':
+                    imageList.select(detail.index, false);
+                    imageList.toggleUnwanted(detail.index);
+                    break;
+            }        
+        }
     }
 
     // Invoked when an action button is clicked on an image.
@@ -344,15 +357,17 @@ export class ZoomModal extends BaseModal {
         const detail = event.detail,
             imageList = this.el.image.imageList;
 
-        switch (detail.action) {
-            case 'select':
-                imageList.toggleSelect(detail.index);
-                imageList.unwanted(detail.index, false);
-                break;
-            case 'unwanted':
-                imageList.select(detail.index, false);
-                imageList.toggleUnwanted(detail.index);
-                break;            
+        if (!this.pickerLocked) {
+            switch (detail.action) {
+                case 'select':
+                    imageList.toggleSelect(detail.index);
+                    imageList.unwanted(detail.index, false);
+                    break;
+                case 'unwanted':
+                    imageList.select(detail.index, false);
+                    imageList.toggleUnwanted(detail.index);
+                    break;            
+            }
         }
     }
 

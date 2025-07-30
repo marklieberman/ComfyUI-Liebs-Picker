@@ -125,6 +125,42 @@ export class ImageList extends EventTarget {
 
     // -------------------------------------------------------------------------
 
+    // Applied a selection by selecting or unwanting by index.
+    selectAndLock(selected, locked) {
+        if (selected === 'all') {
+            for (const item of this.items) {
+                item.selected = !locked;                
+            }
+        } else
+        if (selected === 'none') {
+            for (const item of this.items) {
+                item.selected = false;                
+            }
+        } else {
+            // Parse the selection into an array of indexes.
+            selected = selected.split(',')
+                .map(i => Number.parseInt(i))
+                .filter(i => Number.isFinite(i))
+                // Convert 1-based list to 0-based index.
+                .map(i => i - 1)
+                .filter(i => (i >= 0) && (i < this.items.length))
+
+            if (selected.length) {
+                // When the selection is locked, instead of picking the selected items - unwant the unselected items.
+                for (let i = 0; i < this.items.length; i++) {
+                    let isSelected = selected.includes(i);
+                    if (isSelected && !locked) {
+                        this.select(i, true);
+                    } else
+                    if (!isSelected && locked) {
+                        this.unwanted(i, true);
+                    }
+                }
+            }
+        }
+        
+    }
+
     getResult() {
         const result = []
         for (const [i, item] of Object.entries(this.items)) {

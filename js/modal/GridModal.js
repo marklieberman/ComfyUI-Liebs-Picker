@@ -66,8 +66,15 @@ export class GridModal extends BaseModal {
         this.mouseOverImage = null;
         this.pickerMode = options.pickerMode ?? 'picker';
         this.pickerModeMustPick = options.pickerModeMustPick ?? false;
+        this.pickerLocked = options.pickerLocked ?? false;
         this.setTitle(options.title);
         this.setImageList(options.imageList);
+
+        if (this.pickerLocked) {
+            this.classList.add("picker-locked");
+            this.pickerModeMustPick = false;
+        }
+
         this.updateSendButton();
 
         // Display SEGS controls when features are enabled.
@@ -172,7 +179,8 @@ export class GridModal extends BaseModal {
                     const index = getFocusedIndex() ?? 0;
                     this.imageList.getImageSegments(index)?.nextLabel(n);
                 }
-            } else {
+            } else
+            if (!this.pickerLocked) {
                 if (n < this.imageList.length) {
                     handled = true;
                     switch (this.pickerMode) {
@@ -230,7 +238,7 @@ export class GridModal extends BaseModal {
             this.el.imageList.lastChild.focus();
         } else
         // Select an image with E or /.
-        if (letterKey === 'E' || letterKey === '/') {
+        if (!this.pickerLocked && (letterKey === 'E' || letterKey === '/')) {
             handled = true;            
             const index = getFocusedIndex() ?? 0;
             switch (this.pickerMode) {
@@ -245,7 +253,7 @@ export class GridModal extends BaseModal {
             }
         } else
         // Unwant an image with X or '.
-        if (letterKey === 'X' || letterKey === '\'') {
+        if (!this.pickerLocked && (letterKey === 'X' || letterKey === '\'')) {
             handled = true;
             const index = getFocusedIndex() ?? 0;            
             switch (this.pickerMode) {
@@ -301,11 +309,15 @@ export class GridModal extends BaseModal {
             mustPick = (this.pickerMode === 'picker') && this.pickerModeMustPick;
 
         if ((selectedCount > 0) || mustPick) {
-            this.el.sendButton.innerText = `Send (${selectedCount} selected)`;
             this.el.sendButton.disabled = selectedCount < 1;
+            this.el.sendButton.innerText = `Send (${selectedCount} selected)`;
         } else {
-            this.el.sendButton.innerText = `Send (${wantedCount} remaining)`;
             this.el.sendButton.disabled = wantedCount < 1;
+            if (this.pickerLocked) {
+                this.el.sendButton.innerText = `Send (${wantedCount} selected)`;
+            } else {
+                this.el.sendButton.innerText = `Send (${wantedCount} remaining)`;
+            }
         }
     }
 
@@ -357,15 +369,17 @@ export class GridModal extends BaseModal {
     onImageClick(event) {
         const detail = event.detail;
 
-        switch (this.pickerMode) {
-            case 'picker':
-                this.imageList.toggleSelect(detail.index);
-                this.imageList.unwanted(detail.index, false);
-                break;
-            case 'filter':
-                this.imageList.select(detail.index, false);
-                this.imageList.toggleUnwanted(detail.index);
-                break;
+        if (!this.pickerLocked) {
+            switch (this.pickerMode) {
+                case 'picker':
+                    this.imageList.toggleSelect(detail.index);
+                    this.imageList.unwanted(detail.index, false);
+                    break;
+                case 'filter':
+                    this.imageList.select(detail.index, false);
+                    this.imageList.toggleUnwanted(detail.index);
+                    break;
+            }
         }
         
         // Reset focus back to the modal to avoid focus outlines on the images when not using keyboard.
@@ -376,15 +390,17 @@ export class GridModal extends BaseModal {
     onImageAction(event) {
         const detail = event.detail;   
                  
-        switch (detail.action) {
-            case 'select':
-                this.imageList.toggleSelect(detail.index);
-                this.imageList.unwanted(detail.index, false);
-                break;
-            case 'unwanted':
-                this.imageList.select(detail.index, false);
-                this.imageList.toggleUnwanted(detail.index);
-                break;            
+        if (!this.pickerLocked) {
+            switch (detail.action) {
+                case 'select':
+                    this.imageList.toggleSelect(detail.index);
+                    this.imageList.unwanted(detail.index, false);
+                    break;
+                case 'unwanted':
+                    this.imageList.select(detail.index, false);
+                    this.imageList.toggleUnwanted(detail.index);
+                    break;            
+            }
         }
     }
 
@@ -451,6 +467,7 @@ export class GridModal extends BaseModal {
             title: this.title,
             pickerMode: this.pickerMode,
             pickerModeMustPick: this.pickerModeMustPick,
+            pickerLocked: this.pickerLocked,
             imageList: this.imageList,
             index,
             segsControls: this.segsControls,

@@ -34,9 +34,11 @@ class LiebsPickerSEGS(PreviewImage):
                 "images": ("IMAGE",),
             },
             "optional": {
+                "selected": ("STRING", { "default": "none", "tooltip":"Comma-separated list of image indexes to select, 'all', or 'none'" }),
+                "locked": ("BOOLEAN", { "default": False, "tooltip": "Prevent selected images from being changed" }),
                 "segs": ("SEGS",),
-                "segs_labels": ("STRING",),
-                "init_labels": ("BOOLEAN", {"default": True}),
+                "segs_labels": ("STRING", { "tooltip":"Comma-separated list of labels for segments" }),
+                "init_labels": ("BOOLEAN", {"default": True, "tooltip":"Apply segs_labels to segments automatically"})
             },
             "hidden": {
                 "picker_tab_id": ("STRING",),
@@ -53,7 +55,7 @@ class LiebsPickerSEGS(PreviewImage):
     CATEGORY = "image_filter"
     OUTPUT_NODE = False
 
-    def IS_CHANGED(images, picker_tab_id, title, unique_id, segs=None, segs_labels=None, init_labels=[False]):
+    def IS_CHANGED(images, picker_tab_id, title, unique_id, selected=["none"], locked=[False], segs=None, segs_labels=None, init_labels=[False]):
         return float("NaN")
 
     def get_segs_info(segs, seg_labels, init_labels):
@@ -70,7 +72,7 @@ class LiebsPickerSEGS(PreviewImage):
                 segs_info.append({
                     "size": segs[0],
                     "bbox": seg.bbox.tolist(),
-                    "label": seg_labels[i % len(seg_labels)] if init_labels[0] and seg_labels is not None else seg.label,
+                    "label": seg_labels[i % len(seg_labels)] if init_labels[0] and seg_labels is not None and len(seg_labels) > 0 else seg.label,
                     "labels": labels
                 })
         
@@ -92,10 +94,12 @@ class LiebsPickerSEGS(PreviewImage):
         """
         return [ "segs-controls" ]
         
-    def func(self, images, picker_tab_id, title, unique_id, segs=None, segs_labels=None, init_labels=[False]):
+    def func(self, images, picker_tab_id, title, unique_id, selected=["none"], locked=[False], segs=None, segs_labels=None, init_labels=[False]):
         assert len(picker_tab_id) == 1
         assert len(title) == 1
         assert len(unique_id) == 1
+        assert len(selected) == 1
+        assert len(locked) == 1
 
         picker_tab_id = picker_tab_id[0]
         title = title[0]
@@ -137,7 +141,9 @@ class LiebsPickerSEGS(PreviewImage):
             "title": title, 
             "unique_id": unique_id, 
             "features": self.get_features(),
-            "images": image_list
+            "images": image_list,
+            "selected": selected[0],
+            "locked": locked[0]
         })
         send_request("liebs-picker-images", req)
         
@@ -188,6 +194,9 @@ class LiebsPickerBasic(LiebsPickerSEGS):
             "required": {
                 "images": ("IMAGE",),
             },
+            "optional": {
+                "selected": ("STRING", { "default": "none", "tooltip":"Comma-separated list of image indexes to select, 'all', or 'none'" }),
+            },
             "hidden": {
                 "picker_tab_id": ("STRING",),
                 "title": ("STRING",),
@@ -207,8 +216,8 @@ class LiebsPickerBasic(LiebsPickerSEGS):
         # Do not enable any extra features.
         return []
 
-    def IS_CHANGED(self, images, picker_tab_id, title, unique_id):
+    def IS_CHANGED(self, images, picker_tab_id, title, unique_id, selected=["none"]):
         return float("NaN")
 
-    def func(self, images, picker_tab_id, title, unique_id):
-        return super().func(images, picker_tab_id, title, unique_id, None, None, False)
+    def func(self, images, picker_tab_id, title, unique_id, selected=["none"]):
+        return super().func(images, picker_tab_id, title, unique_id, selected, [False], None, None)
