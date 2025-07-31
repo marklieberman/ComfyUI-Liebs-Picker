@@ -17,26 +17,44 @@ export class BBoxElement extends HTMLElement {
             label: this.querySelector('.label')
         };
 
-        const [ height, width ] = size,
+        const [ imageHeight, imageWidth ] = size,
               left = bbox[0],
               top = bbox[1],
               right = bbox[2],
-              bottom = bbox[3];
+              bottom = bbox[3],
+              height = bottom - top,
+              width = right - left;
 
-        this.style.left = `${(left / width) * 100}%`;
-        this.style.top = `${(top / height) * 100}%`;
-        this.style.width = `${((right - left) / width) * 100}%`;
-        this.style.height = `${((bottom - top) / height) * 100}%`;
+        this.style.left = `${(left / imageWidth) * 100}%`;
+        this.style.top = `${(top / imageHeight) * 100}%`;
+        this.style.width = `${(width / imageWidth) * 100}%`;
+        this.style.height = `${(height / imageHeight) * 100}%`;
+
+        // Ensure that smaller boxes are placed on top of larger boxes.
+        this.style.zIndex = Math.round(2147483647 - (height * width));
 
         // Send clicks to the overlay element.
-        this.addEventListener('click', event => {
-            this.dispatchEvent(new CustomEvent('bbox-click', {
+        this.addEventListener('mousedown', event => {
+            this.dispatchEvent(new CustomEvent('bbox-mousedown', {
                 detail: {
+                    button: event.button,
                     element: this,
                     segn
                 }
             }))
 
+            event.preventDefault();
+            event.stopPropagation();
+        });
+
+        // Prevent clicks from propagating.
+        this.addEventListener('click', event => {
+            event.preventDefault();
+            event.stopPropagation();
+        });
+
+        // Prevent the context menu from being display.
+        this.addEventListener('contextmenu', event => {
             event.preventDefault();
             event.stopPropagation();
         });

@@ -35,7 +35,7 @@ export class BBoxOverlayElement extends HTMLElement {
                       label = this.segments.label[segn];
 
                 const bboxElement = new BBoxElement(segn, sizes, bbox);
-                bboxElement.addEventListener('bbox-click', this.bboxClickHandler);
+                bboxElement.addEventListener('bbox-mousedown', this.bboxClickHandler);
                 bboxElement.setLabel(label);                
 
                 this.el.bboxes.push(bboxElement);
@@ -51,7 +51,14 @@ export class BBoxOverlayElement extends HTMLElement {
 
     onBBoxClick(event) {
         const detail = event.detail;
-        this.segments.nextLabel(detail.segn);
+        switch (detail.button) {
+            case 0:
+                this.segments.nextLabel(detail.segn, 1);
+                break;
+            case 2:
+                this.segments.nextLabel(detail.segn, -1);
+                break;
+        }
     }
 
 }

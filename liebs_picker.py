@@ -62,6 +62,14 @@ class LiebsPickerSEGS(PreviewImage):
         """
         Collect segment information for the fronend to visualize.
         """
+        def get_bbox(bbox):
+            return ([
+                getattr(bbox[0], "tolist", lambda: bbox[0])(),
+                getattr(bbox[1], "tolist", lambda: bbox[1])(),
+                getattr(bbox[2], "tolist", lambda: bbox[2])(),
+                getattr(bbox[3], "tolist", lambda: bbox[3])(),
+            ])     
+
         segs_info = []
         if len(segs[1]) > 0:
             for i, seg in enumerate(segs[1]):
@@ -71,7 +79,7 @@ class LiebsPickerSEGS(PreviewImage):
 
                 segs_info.append({
                     "size": segs[0],
-                    "bbox": seg.bbox.tolist(),
+                    "bbox": get_bbox(seg.bbox),
                     "label": seg_labels[i % len(seg_labels)] if init_labels[0] and seg_labels is not None and len(seg_labels) > 0 else seg.label,
                     "labels": labels
                 })

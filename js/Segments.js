@@ -19,12 +19,15 @@ export class Segments extends EventTarget {
         }
     }
 
-    nextLabel(segn) {
+    nextLabel(segn, offset = 1) {
         const labels = this.labels[segn];
 
         // Get the index of the next label in the list of options.
         let index = labels.indexOf(this.label[segn]);
-        index = (index === -1) ? 0 : (index + 1) % labels.length;
+        index = (index === -1) ? 0 : (index + offset) % labels.length;
+        if (index < 0) {
+            index = labels.length - 1;
+        }
         this.label[segn] = labels[index];
 
         this.dispatchEvent(new CustomEvent('segment-change', {

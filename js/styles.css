@@ -204,7 +204,7 @@ liebs-picker-bbox {
 
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: flex-start;    
 
     color: #0F0;
     background-color: rgba(0,128,0,0.2);
@@ -225,8 +225,8 @@ liebs-picker-image[data-unwanted="yes"] liebs-picker-bbox {
 }
 
 liebs-picker-bbox > .label {
-    position: relative;
-    top: -24px;
+    position: absolute;
+    bottom: 4px;
     white-space: nowrap;
     background-color: rgba(0,128,0,0.8);    
 }
