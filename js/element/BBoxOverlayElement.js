@@ -32,9 +32,10 @@ export class BBoxOverlayElement extends HTMLElement {
             for (let segn = 0; segn < this.segments.bboxes.length; segn++) {
                 const sizes = this.segments.sizes[segn],
                       bbox = this.segments.bboxes[segn],
-                      label = this.segments.label[segn];
+                      label = this.segments.label[segn],
+                      maskUrl = this.segments.getMaskUrl(segn);
 
-                const bboxElement = new BBoxElement(segn, sizes, bbox);
+                const bboxElement = new BBoxElement(segn, sizes, bbox, maskUrl);
                 bboxElement.addEventListener('bbox-mousedown', this.bboxClickHandler);
                 bboxElement.setLabel(label);                
 

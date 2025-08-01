@@ -4,6 +4,7 @@ from aiohttp import web
 from server import PromptServer
 from comfy.model_management import InterruptProcessingException, throw_exception_if_processing_interrupted
 from nodes import PreviewImage
+import numpy as np
 
 mailbox = {}
 
@@ -58,7 +59,7 @@ class LiebsPickerSEGS(PreviewImage):
     def IS_CHANGED(images, picker_tab_id, title, unique_id, selected=["none"], locked=[False], segs=None, segs_labels=None, init_labels=[False]):
         return float("NaN")
 
-    def get_segs_info(segs, seg_labels, init_labels):
+    def get_segs_info(self, segs, seg_labels, init_labels):
         """
         Collect segment information for the fronend to visualize.
         """
@@ -68,7 +69,22 @@ class LiebsPickerSEGS(PreviewImage):
                 getattr(bbox[1], "tolist", lambda: bbox[1])(),
                 getattr(bbox[2], "tolist", lambda: bbox[2])(),
                 getattr(bbox[3], "tolist", lambda: bbox[3])(),
-            ])     
+            ])
+        
+        def get_mask_image(seg):
+            try:
+                left = seg.bbox[0] - seg.crop_region[0]
+                top = seg.bbox[1] - seg.crop_region[1]                    
+                right = left + (seg.bbox[2] - seg.bbox[0])
+                bottom = top + (seg.bbox[3] - seg.bbox[1])
+
+                cropped_mask = (seg.cropped_mask * 255).astype(np.uint8)
+                cropped_mask = cropped_mask[top:bottom, left:right]
+                cropped_mask = torch.from_numpy(cropped_mask.astype(np.float32) / 255.0)
+                return self.save_images(images=[cropped_mask])['ui']['images'][0]
+            except Exception as e: 
+                print("Failed to generate mask from SEG", e)
+                pass
 
         segs_info = []
         if len(segs[1]) > 0:
@@ -80,6 +96,7 @@ class LiebsPickerSEGS(PreviewImage):
                 segs_info.append({
                     "size": segs[0],
                     "bbox": get_bbox(seg.bbox),
+                    "mask": get_mask_image(seg),
                     "label": seg_labels[i % len(seg_labels)] if init_labels[0] and seg_labels is not None and len(seg_labels) > 0 else seg.label,
                     "labels": labels
                 })
@@ -140,7 +157,7 @@ class LiebsPickerSEGS(PreviewImage):
         for i, url in enumerate(urls):
             image_list.append({
                 "url": url,
-                "segments": LiebsPickerSEGS.get_segs_info(segs_list[i], segs_labels, init_labels) if segs_list is not None else []
+                "segments": self.get_segs_info(segs_list[i], segs_labels, init_labels) if segs_list is not None else []
             })
 
         # Send a message to the frontend to display the images.

@@ -1,3 +1,5 @@
+import { api } from "../../scripts/api.js";
+
 /**
  * Segment data for an image.
  */
@@ -10,13 +12,21 @@ export class Segments extends EventTarget {
         this.bboxes = [];
         this.label = [];
         this.labels = [];
+        this.masks = [];
 
         for (const seg of segments) {
             this.sizes.push(seg.size);
             this.bboxes.push(seg.bbox);
             this.label.push(seg.label || 'unknown');
             this.labels.push(seg.labels || []);
+            this.masks.push(seg.mask);
         }
+    }
+
+    // Get the URL for the image at index.
+    getMaskUrl (segn) {
+        const url = this.masks[segn];
+        return api.apiURL(`/view?filename=${encodeURIComponent(url.filename)}&type=${url.type ?? "input"}&subfolder=${url.subfolder ?? ""}&r=${Math.random()}`);
     }
 
     nextLabel(segn, offset = 1) {

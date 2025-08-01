@@ -83,6 +83,7 @@ app.registerExtension({
             // Contains the list of images and their selection status.
             const imageList = new ImageList(detail.images);
             imageList.selectAndLock(detail.selected, detail.locked);
+            console.log(detail);
             
             // Show the modal.
             const modal = new GridModal({

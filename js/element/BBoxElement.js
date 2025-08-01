@@ -1,4 +1,5 @@
 const ELEMENT_HTML = `
+    <div></div>
     <span class="label"></span>
 `;
 
@@ -7,13 +8,14 @@ const ELEMENT_HTML = `
  */
 export class BBoxElement extends HTMLElement {
 
-    constructor(segn, size, bbox) {
+    constructor(segn, size, bbox, maskUrl) {
         super();
 
         this.segn = segn;
-
+        
         this.innerHTML = ELEMENT_HTML;
         this.el = {
+            div: this.querySelector('div'),
             label: this.querySelector('.label')
         };
 
@@ -58,6 +60,12 @@ export class BBoxElement extends HTMLElement {
             event.preventDefault();
             event.stopPropagation();
         });
+
+        if (maskUrl) {
+            // Override the bounding box style when a mask is available.
+            this.classList.add("masked");
+            this.el.div.style.maskImage = `url("${maskUrl}")`;
+        }
     }
 
     setLabel(value) {

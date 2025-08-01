@@ -200,7 +200,12 @@ liebs-picker-bbox {
     top: 0px;
     left: 0px;
     bottom:100px;
-    right: 100px;
+    right: 100px;    
+}
+
+liebs-picker-bbox > div {
+    width: 100%;
+    height: 100%;
 
     display: flex;
     justify-content: center;
@@ -208,15 +213,20 @@ liebs-picker-bbox {
 
     color: #0F0;
     background-color: rgba(0,128,0,0.2);
-    border-radius: 8px;
+    border-radius: 4px;
     border: 2px solid #008000;
-    text-align: center;
     
     pointer-events: all;
     user-select: none;
 }
 
-liebs-picker-bbox:hover {
+liebs-picker-bbox.masked > div {
+    border: none;
+    mask-mode: luminance;
+    mask-size: contain;
+}
+
+liebs-picker-bbox:hover > div {
     background-color: rgba(128,255,128,0.3);    
 }
 
@@ -226,7 +236,8 @@ liebs-picker-image[data-unwanted="yes"] liebs-picker-bbox {
 
 liebs-picker-bbox > .label {
     position: absolute;
-    bottom: 4px;
+    left: 0px;
+    bottom: 0px;
     white-space: nowrap;
     background-color: rgba(0,128,0,0.8);    
 }
