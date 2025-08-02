@@ -37,9 +37,14 @@ class LiebsPickerSEGS(PreviewImage):
             "optional": {
                 "selected": ("STRING", { "default": "none", "tooltip":"Comma-separated list of image indexes to select, 'all', or 'none'" }),
                 "locked": ("BOOLEAN", { "default": False, "tooltip": "Prevent selected images from being changed" }),
-                "segs": ("SEGS",),
-                "segs_labels": ("STRING", { "tooltip":"Comma-separated list of labels for segments" }),
-                "init_labels": ("BOOLEAN", {"default": True, "tooltip":"Apply segs_labels to segments automatically"})
+                "segs": ("SEGS", { "tooltip": "SEGS to display over the images" }),
+                "segs_labels": ("STRING", { "tooltip":"Comma-separated list of possible labels for segments" }),
+                "segs_label_mode": ([ 
+                    "any",             # Pick any label and no initial pick.
+                    "matching_prefix", # Pick from labels with matching prefix and initialize to first match.
+                    "matching_suffix"  # Pick from labels with matching suffix and initialize to first match.
+                ], {"tooltip":"Apply segs_labels to segments automatically"}),
+                "segs_on": ("BOOLEAN", {"default": True, "tooltip":"Display SEGS by default when modal opens"}),
             },
             "hidden": {
                 "picker_tab_id": ("STRING",),
@@ -56,22 +61,25 @@ class LiebsPickerSEGS(PreviewImage):
     CATEGORY = "image_filter"
     OUTPUT_NODE = False
 
-    def IS_CHANGED(images, picker_tab_id, title, unique_id, selected=["none"], locked=[False], segs=None, segs_labels=None, init_labels=[False]):
-        return float("NaN")
-
-    def get_segs_info(self, segs, seg_labels, init_labels):
+    def get_segs_info(self, segs, seg_labels, segs_label_mode):
         """
         Collect segment information for the fronend to visualize.
         """
         def get_bbox(bbox):
+            """
+            Get the bounding box for this segments.
+            """
             return ([
                 getattr(bbox[0], "tolist", lambda: bbox[0])(),
                 getattr(bbox[1], "tolist", lambda: bbox[1])(),
                 getattr(bbox[2], "tolist", lambda: bbox[2])(),
-                getattr(bbox[3], "tolist", lambda: bbox[3])(),
+                getattr(bbox[3], "tolist", lambda: bbox[3])()
             ])
         
         def get_mask_image(seg):
+            """
+            Get the mask image for this segment.
+            """
             try:
                 left = int(seg.bbox[0] - seg.crop_region[0])
                 top = int(seg.bbox[1] - seg.crop_region[1])
@@ -81,16 +89,41 @@ class LiebsPickerSEGS(PreviewImage):
                 cropped_mask = (seg.cropped_mask * 255).astype(np.uint8)
                 cropped_mask = cropped_mask[top:bottom, left:right]
                 cropped_mask = torch.from_numpy(cropped_mask.astype(np.float32) / 255.0)
+
                 return self.save_images(images=[cropped_mask])['ui']['images'][0]
             except Exception as e: 
                 print("Failed to generate mask from SEG", e)
                 print("bbox", seg.bbox, "crop_region", seg.crop_region)
                 pass
 
+        def get_labels(seg):
+            """
+            Get filtered labels for this segment.
+            """
+            nonlocal seg_labels, segs_label_mode
+
+            if segs_label_mode == "matching_prefix":
+                return [ label for label in seg_labels if label.startswith(seg.label) ]
+            elif segs_label_mode == "matching_suffix":
+                return [ label for label in seg_labels if label.endswith(seg.label) ]
+            else:
+                return seg_labels.copy()
+
+        def get_label(seg, labels):
+            """ 
+            Get initial label for this segment.
+            """
+            nonlocal segs_label_mode
+
+            if segs_label_mode == "matching_prefix" or segs_label_mode == "matching_suffix":
+                return labels[0]
+            else:
+                return seg.label
+
         segs_info = []
         if len(segs[1]) > 0:
             for i, seg in enumerate(segs[1]):
-                labels = seg_labels.copy()
+                labels = get_labels(seg)
                 if not seg.label in labels:
                     labels.append(seg.label)
 
@@ -98,8 +131,8 @@ class LiebsPickerSEGS(PreviewImage):
                     "size": segs[0],
                     "bbox": get_bbox(seg.bbox),
                     "mask": get_mask_image(seg),
-                    "label": seg_labels[i % len(seg_labels)] if init_labels[0] and seg_labels is not None and len(seg_labels) > 0 else seg.label,
-                    "labels": labels
+                    "labels": labels,
+                    "label": get_label(seg, labels)                    
                 })
         
         return segs_info
@@ -119,13 +152,20 @@ class LiebsPickerSEGS(PreviewImage):
         List of features to enable in the picker modal.
         """
         return [ "segs-controls" ]
+    
+    def IS_CHANGED(images, picker_tab_id, title, unique_id, selected=["none"], locked=[False], 
+                   segs=None, segs_labels=None, segs_label_mode=["any"], segs_on=[True]):
+        return float("NaN")
         
-    def func(self, images, picker_tab_id, title, unique_id, selected=["none"], locked=[False], segs=None, segs_labels=None, init_labels=[False]):
+    def func(self, images, picker_tab_id, title, unique_id, selected=["none"], locked=[False], 
+             segs=None, segs_labels=None, segs_label_mode=["any"], segs_on=[True]):
         assert len(picker_tab_id) == 1
         assert len(title) == 1
         assert len(unique_id) == 1
         assert len(selected) == 1
         assert len(locked) == 1
+        assert len(segs_label_mode) == 1
+        assert len(segs_on) == 1
 
         picker_tab_id = picker_tab_id[0]
         title = title[0]
@@ -158,7 +198,7 @@ class LiebsPickerSEGS(PreviewImage):
         for i, url in enumerate(urls):
             image_list.append({
                 "url": url,
-                "segments": self.get_segs_info(segs_list[i], segs_labels, init_labels) if segs_list is not None else []
+                "segments": self.get_segs_info(segs_list[i], segs_labels, segs_label_mode[0]) if segs_list is not None else []
             })
 
         # Send a message to the frontend to display the images.
@@ -169,7 +209,8 @@ class LiebsPickerSEGS(PreviewImage):
             "features": self.get_features(),
             "images": image_list,
             "selected": selected[0],
-            "locked": locked[0]
+            "locked": locked[0],
+            "segs_on": segs_on[0]
         })
         send_request("liebs-picker-images", req)
         
@@ -212,7 +253,7 @@ class LiebsPickerSEGS(PreviewImage):
 
 class LiebsPickerBasic(LiebsPickerSEGS):
     """
-    The basic image picker with no bells or whistles.
+    The standard image picker with no bells or whistles.
     """
     @classmethod
     def INPUT_TYPES(s):
@@ -246,4 +287,4 @@ class LiebsPickerBasic(LiebsPickerSEGS):
         return float("NaN")
 
     def func(self, images, picker_tab_id, title, unique_id, selected=["none"]):
-        return super().func(images, picker_tab_id, title, unique_id, selected, [False], None, None)
+        return super().func(images, picker_tab_id, title, unique_id, selected)

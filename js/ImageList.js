@@ -115,15 +115,10 @@ export class ImageList extends EventTarget {
         return unwanted;
     }
 
-    // -------------------------------------------------------------------------
-    // Segments
-
     // Get the segment information for the image at index.
     getImageSegments(index) {
         return this.items[index].segments;
     }
-
-    // -------------------------------------------------------------------------
 
     // Applied a selection by selecting or unwanting by index.
     selectAndLock(selected, locked) {
@@ -161,10 +156,12 @@ export class ImageList extends EventTarget {
         
     }
 
+    // Get the list of images to pass and segment labels.
     getResult() {
         const result = []
+        const filterMode = this.selectedCount === 0;        
         for (const [i, item] of Object.entries(this.items)) {
-            if (item.selected) {
+            if (item.selected || (filterMode && !item.unwanted)) {
                 result.push({
                     index: Number(i),
                     segments: {

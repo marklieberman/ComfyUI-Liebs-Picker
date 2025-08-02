@@ -1,7 +1,7 @@
 {
   "id": "f4584930-5e91-4494-9d6c-115852fd55cd",
   "revision": 0,
-  "last_node_id": 22,
+  "last_node_id": 23,
   "last_link_id": 38,
   "nodes": [
     {
@@ -16,7 +16,7 @@
         680
       ],
       "flags": {},
-      "order": 14,
+      "order": 15,
       "mode": 0,
       "inputs": [
         {
@@ -85,7 +85,7 @@
         512,
         true,
         1024,
-        823069038645508,
+        671408707099250,
         "randomize",
         20,
         5,
@@ -115,7 +115,7 @@
         680
       ],
       "flags": {},
-      "order": 15,
+      "order": 16,
       "mode": 0,
       "inputs": [
         {
@@ -184,7 +184,7 @@
         512,
         true,
         1024,
-        917011000633552,
+        155349454134061,
         "randomize",
         20,
         5,
@@ -214,7 +214,7 @@
         650
       ],
       "flags": {},
-      "order": 16,
+      "order": 17,
       "mode": 0,
       "inputs": [
         {
@@ -243,7 +243,7 @@
         310
       ],
       "flags": {},
-      "order": 10,
+      "order": 11,
       "mode": 0,
       "inputs": [
         {
@@ -345,7 +345,7 @@
         50
       ],
       "flags": {},
-      "order": 8,
+      "order": 9,
       "mode": 0,
       "inputs": [
         {
@@ -375,116 +375,6 @@
         "Node name for S&R": "VAEDecode"
       },
       "widgets_values": []
-    },
-    {
-      "id": 17,
-      "type": "ImpactSEGSLabelFilter",
-      "pos": [
-        2210,
-        140
-      ],
-      "size": [
-        380,
-        132
-      ],
-      "flags": {},
-      "order": 12,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "segs",
-          "type": "SEGS",
-          "link": 19
-        }
-      ],
-      "outputs": [
-        {
-          "name": "filtered_SEGS",
-          "type": "SEGS",
-          "links": [
-            37
-          ]
-        },
-        {
-          "name": "remained_SEGS",
-          "type": "SEGS",
-          "links": null
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-impact-pack",
-        "ver": "d900939861ded1ca09ba3ba1735d281810afe53d",
-        "Node name for S&R": "ImpactSEGSLabelFilter"
-      },
-      "widgets_values": [
-        "all",
-        "red_eyes_girl"
-      ]
-    },
-    {
-      "id": 13,
-      "type": "LiebsPickerSEGS",
-      "pos": [
-        1810,
-        140
-      ],
-      "size": [
-        280,
-        130
-      ],
-      "flags": {},
-      "order": 11,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 16
-        },
-        {
-          "name": "segs",
-          "shape": 7,
-          "type": "SEGS",
-          "link": 14
-        }
-      ],
-      "outputs": [
-        {
-          "name": "IMAGES",
-          "type": "IMAGE",
-          "links": []
-        },
-        {
-          "name": "IMAGES",
-          "shape": 6,
-          "type": "IMAGE",
-          "links": [
-            27
-          ]
-        },
-        {
-          "name": "SEGS",
-          "shape": 6,
-          "type": "SEGS",
-          "links": [
-            19,
-            20
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "liebs-picker",
-        "ver": "af5e845b0e74f35927ae62f05cd390fb22c17561",
-        "Node name for S&R": "LiebsPickerSEGS"
-      },
-      "widgets_values": [
-        "red_eyes_girl,blue_eyes_girl",
-        true,
-        null,
-        null
-      ],
-      "color": "#432",
-      "bgcolor": "#653"
     },
     {
       "id": 5,
@@ -534,7 +424,7 @@
         150
       ],
       "flags": {},
-      "order": 4,
+      "order": 5,
       "mode": 0,
       "inputs": [
         {
@@ -578,7 +468,7 @@
         262
       ],
       "flags": {},
-      "order": 7,
+      "order": 8,
       "mode": 0,
       "inputs": [
         {
@@ -618,7 +508,7 @@
         "Node name for S&R": "KSampler"
       },
       "widgets_values": [
-        700876245683366,
+        830298383815183,
         "randomize",
         35,
         5,
@@ -698,7 +588,7 @@
         150
       ],
       "flags": {},
-      "order": 3,
+      "order": 4,
       "mode": 0,
       "inputs": [
         {
@@ -742,7 +632,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 9,
+      "order": 10,
       "mode": 0,
       "inputs": [
         {
@@ -770,6 +660,203 @@
       "widgets_values": []
     },
     {
+      "id": 21,
+      "type": "CLIPTextEncode",
+      "pos": [
+        2210,
+        310
+      ],
+      "size": [
+        380,
+        110
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 21
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "slot_index": 0,
+          "links": [
+            24
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.29",
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "1girl, red eyes, angry"
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 13,
+      "type": "LiebsPickerSEGS",
+      "pos": [
+        1810,
+        140
+      ],
+      "size": [
+        280,
+        202
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 16
+        },
+        {
+          "name": "segs",
+          "shape": 7,
+          "type": "SEGS",
+          "link": 14
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGES",
+          "type": "IMAGE",
+          "links": []
+        },
+        {
+          "name": "IMAGES",
+          "shape": 6,
+          "type": "IMAGE",
+          "links": [
+            27
+          ]
+        },
+        {
+          "name": "SEGS",
+          "shape": 6,
+          "type": "SEGS",
+          "links": [
+            19,
+            20
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "liebs-picker",
+        "ver": "af5e845b0e74f35927ae62f05cd390fb22c17561",
+        "Node name for S&R": "LiebsPickerSEGS"
+      },
+      "widgets_values": [
+        "",
+        true,
+        "mean_face,nice_face",
+        "matching_suffix",
+        true,
+        null,
+        null
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 17,
+      "type": "ImpactSEGSLabelFilter",
+      "pos": [
+        2210,
+        140
+      ],
+      "size": [
+        380,
+        132
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "segs",
+          "type": "SEGS",
+          "link": 19
+        }
+      ],
+      "outputs": [
+        {
+          "name": "filtered_SEGS",
+          "type": "SEGS",
+          "links": [
+            37
+          ]
+        },
+        {
+          "name": "remained_SEGS",
+          "type": "SEGS",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-impact-pack",
+        "ver": "d900939861ded1ca09ba3ba1735d281810afe53d",
+        "Node name for S&R": "ImpactSEGSLabelFilter"
+      },
+      "widgets_values": [
+        "all",
+        "mean_face"
+      ]
+    },
+    {
+      "id": 22,
+      "type": "CLIPTextEncode",
+      "pos": [
+        2210,
+        1110
+      ],
+      "size": [
+        380,
+        110
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 22
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "slot_index": 0,
+          "links": [
+            25
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.29",
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "1girl, blue eyes, smile"
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
       "id": 18,
       "type": "ImpactSEGSLabelFilter",
       "pos": [
@@ -781,7 +868,7 @@
         132
       ],
       "flags": {},
-      "order": 13,
+      "order": 14,
       "mode": 0,
       "inputs": [
         {
@@ -811,92 +898,31 @@
       },
       "widgets_values": [
         "all",
-        "blue_eyes_girl"
+        "nice_face"
       ]
     },
     {
-      "id": 21,
-      "type": "CLIPTextEncode",
+      "id": 23,
+      "type": "Note",
       "pos": [
-        2210,
-        310
+        1410,
+        -160
       ],
       "size": [
-        380,
-        110
+        280,
+        88
       ],
       "flags": {},
-      "order": 5,
+      "order": 3,
       "mode": 0,
-      "inputs": [
-        {
-          "name": "clip",
-          "type": "CLIP",
-          "link": 21
-        }
-      ],
-      "outputs": [
-        {
-          "name": "CONDITIONING",
-          "type": "CONDITIONING",
-          "slot_index": 0,
-          "links": [
-            24
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.29",
-        "Node name for S&R": "CLIPTextEncode"
-      },
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
       "widgets_values": [
-        "1girl, red eyes"
+        "face_yolo8m detects 'face' SEGs."
       ],
-      "color": "#232",
-      "bgcolor": "#353"
-    },
-    {
-      "id": 22,
-      "type": "CLIPTextEncode",
-      "pos": [
-        2210,
-        1110
-      ],
-      "size": [
-        380,
-        110
-      ],
-      "flags": {},
-      "order": 6,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "clip",
-          "type": "CLIP",
-          "link": 22
-        }
-      ],
-      "outputs": [
-        {
-          "name": "CONDITIONING",
-          "type": "CONDITIONING",
-          "slot_index": 0,
-          "links": [
-            25
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.29",
-        "Node name for S&R": "CLIPTextEncode"
-      },
-      "widgets_values": [
-        "1girl, blue eyes"
-      ],
-      "color": "#232",
-      "bgcolor": "#353"
+      "color": "#432",
+      "bgcolor": "#653"
     }
   ],
   "links": [
@@ -1161,10 +1187,10 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.8954302432552737,
+      "scale": 0.5209868481925544,
       "offset": [
-        -1432.1938601088175,
-        -21.507118648286887
+        506.15950509504205,
+        689.4337625853757
       ]
     },
     "frontendVersion": "1.16.8"

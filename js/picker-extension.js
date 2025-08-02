@@ -83,7 +83,7 @@ app.registerExtension({
             // Contains the list of images and their selection status.
             const imageList = new ImageList(detail.images);
             imageList.selectAndLock(detail.selected, detail.locked);
-            console.log(detail);
+            console.log("picker detail", detail);
             
             // Show the modal.
             const modal = new GridModal({
@@ -92,7 +92,8 @@ app.registerExtension({
                 pickerMode: extensionSettings.get('ImagePicker.PickerMode'),
                 pickerModeMustPick: extensionSettings.get('ImagePicker.PickerModeMustPick'),
                 pickerLocked: detail.locked,
-                segsControls: detail.features.includes('segs-controls')
+                segsControls: detail.features.includes('segs-controls'),
+                showSegments: detail.segs_on
             });
 
             const openZoomed = extensionSettings.get('ImagePicker.OpenZoomed'),
