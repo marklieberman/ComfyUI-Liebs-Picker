@@ -226,7 +226,7 @@ liebs-picker-bbox.masked > div {
     mask-size: contain;
 }
 
-liebs-picker-bbox:hover > div {
+liebs-picker-bbox.hover > div {
     background-color: rgba(128,255,128,0.3);    
 }
 

@@ -73,10 +73,10 @@ class LiebsPickerSEGS(PreviewImage):
         
         def get_mask_image(seg):
             try:
-                left = seg.bbox[0] - seg.crop_region[0]
-                top = seg.bbox[1] - seg.crop_region[1]                    
-                right = left + (seg.bbox[2] - seg.bbox[0])
-                bottom = top + (seg.bbox[3] - seg.bbox[1])
+                left = int(seg.bbox[0] - seg.crop_region[0])
+                top = int(seg.bbox[1] - seg.crop_region[1])
+                right = int(left + (seg.bbox[2] - seg.bbox[0]))
+                bottom = int(top + (seg.bbox[3] - seg.bbox[1]))
 
                 cropped_mask = (seg.cropped_mask * 255).astype(np.uint8)
                 cropped_mask = cropped_mask[top:bottom, left:right]
@@ -84,6 +84,7 @@ class LiebsPickerSEGS(PreviewImage):
                 return self.save_images(images=[cropped_mask])['ui']['images'][0]
             except Exception as e: 
                 print("Failed to generate mask from SEG", e)
+                print("bbox", seg.bbox, "crop_region", seg.crop_region)
                 pass
 
         segs_info = []

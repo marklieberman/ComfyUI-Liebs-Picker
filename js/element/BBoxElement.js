@@ -35,36 +35,41 @@ export class BBoxElement extends HTMLElement {
         // Ensure that smaller boxes are placed on top of larger boxes.
         this.style.zIndex = Math.round(2147483647 - (height * width));
 
-        // Send clicks to the overlay element.
-        this.addEventListener('mousedown', event => {
-            this.dispatchEvent(new CustomEvent('bbox-mousedown', {
-                detail: {
-                    button: event.button,
-                    element: this,
-                    segn
-                }
-            }))
-
-            event.preventDefault();
-            event.stopPropagation();
-        });
-
-        // Prevent clicks from propagating.
-        this.addEventListener('click', event => {
-            event.preventDefault();
-            event.stopPropagation();
-        });
-
-        // Prevent the context menu from being display.
-        this.addEventListener('contextmenu', event => {
-            event.preventDefault();
-            event.stopPropagation();
-        });
-
         if (maskUrl) {
             // Override the bounding box style when a mask is available.
             this.classList.add("masked");
             this.el.div.style.maskImage = `url("${maskUrl}")`;
+
+            const image = new Image();
+            image.onload = () => {
+                this.canvas = new OffscreenCanvas(image.naturalWidth, image.naturalHeight);
+                let context = this.canvas.getContext("2d");
+                context.drawImage(image, 0, 0);
+            }
+            image.src = maskUrl;
+
+        }
+    }
+
+    isPointInsideMask(clientX, clientY) {
+        let rect = this.getBoundingClientRect();
+        if (this.canvas) {
+            // Test the mask pixel data.
+            let scaleX = this.canvas.width / rect.width,
+                scaleY = this.canvas.height / rect.height,
+                testX = (clientX - rect.x) * scaleX,
+                testY = (clientY - rect.y) * scaleY;
+
+            let context = this.canvas.getContext("2d");
+            let pixel = context.getImageData(testX, testY, 1, 1);
+
+            return pixel.data[0] > 0;
+        } else {
+            // Check if the mouse is inside the bounding rectangle.
+            return clientX > rect.left 
+                && clientX < rect.right 
+                && clientY > rect.top
+                && clientY < rect.bottom;
         }
     }
 

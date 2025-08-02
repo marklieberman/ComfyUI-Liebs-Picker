@@ -12,10 +12,87 @@ export class BBoxOverlayElement extends HTMLElement {
             bboxes: []
         };
 
+        // This element is part of the 'segs-control' feature and should be hidden when that feature is not enabled.
         this.classList.add('segs-control');
         
-        this.bboxClickHandler = this.onBBoxClick.bind(this);
+        this.addEventListener('mouseleave', () => {
+            // Remove hover style from all bboxes.
+            for (const bbox of this.el.bboxes) {                
+                bbox.classList.remove('hover');
+            }
+        });
+
+        this.addEventListener('mousemove', event => {
+            // Remove hover style from all bboxes.
+            for (const bbox of this.el.bboxes) {                
+                bbox.classList.remove('hover');
+            }
+
+            // Update hover styles for the bbox under the mouse.
+            this.testPoint(event.clientX, event.clientY, (bbox, inside) => {
+                if (inside) {
+                    bbox.classList.add('hover');
+                } else {
+                    bbox.classList.remove('hover');
+                }
+            });
+        }, { capture: true });
+
+        this.addEventListener('mousedown', event => {
+            // Handle clicks on the bbox under the mouse.
+            if (event.button === 0 || event.button === 2) {
+                // Update hover styles for the bbox under the mouse.
+                this.testPoint(event.clientX, event.clientY, (bbox, inside) => {
+                    if (inside) {
+                        this.onBBoxClick({
+                            detail: {
+                                button: event.button,
+                                segn: this.el.bboxes.indexOf(bbox),
+                                bbox
+                            }
+                        });
+                    }
+                });
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                return;
+            }
+        }, { capture: true });
+
+        // Prevent the clicks from being propagated.
+        this.addEventListener('click', event => {
+            this.testPoint(event.clientX, event.clientY, (bbox, inside) => {
+                if (inside) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+            });
+        }, { capture: true });
+
+        // Prevent the context menu from being displayed.
+        this.addEventListener('contextmenu', event => {
+            event.preventDefault();
+            event.stopPropagation();
+        }, { capture: true });
+
         this.segmentChangeHander = this.onSegmentChange.bind(this);
+    }
+
+    testPoint (clientX, clientY, callback) {
+        for (const bbox of document.elementsFromPoint(event.clientX, event.clientY)) {
+            if (bbox === this) {
+                // Reached the overlay container.
+                return;
+            }
+
+            if (bbox instanceof BBoxElement) {
+                // Bounding box at the top of the stack.
+                callback(bbox, bbox.isPointInsideMask(clientX, clientY));
+                return;
+            }
+        }
     }
 
     setSegments(segments) {
