@@ -24,6 +24,7 @@ A node to pause execution of the workflow and select which input images should p
 | <img src="./docs/images/picker-filter.png" width="500"/> | You can flag both wanted and unwanted images at the same time to help you process a large batch. |
 | <img src="./docs/images/image-buttons.png" width="500"/> | Hidden buttons appear when the mouse cursor hovers over the top-right of an image. |
 | <img src="./docs/images/settings.png" width="500"/> | The modal behaviour and default selection mode are configurable. |
+| <img src="./docs/images/segs-grid.jpeg" width="500"/> | Interactively label SEGS using a clickable overlay. |
 
 ## Controls
 
@@ -45,12 +46,6 @@ A node to pause execution of the workflow and select which input images should p
 
 * Mouse-wheel, Left/Right arrow keys, or AD keys to navigate between images in single image view.
 
-## Included Nodes
-
-### Image Picker
-
-The standard image picker used to select which input images are passed to the output.
-
 ### Image Picker (SEGS)
 
 See: [LiebsPickerSEGS.json](./docs/workflows/LiebsPickerSEGS.json) for an example workflow.
@@ -67,7 +62,7 @@ An example workflow using the SEGS picker would:
 | Label Segments | Filter Segments |
 | :---- | :---- |
 | Assign specific labels to detected segments to compose the image | Filter labels so that segments can be directed to detailers or other nodes. |
-| <video src="./docs/images/segs-demo.mp4" height="400"/> | <img src="./docs/images/segs-filter.png" height="400"> |
+| <video src="https://github.com/user-attachments/assets/ef67d1cd-4968-479b-99ce-1a9de09d8e86" height="300px"> | <img src="./docs/images/segs-filter.png" height="400"> |
 
 #### Node inputs:
 
