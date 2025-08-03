@@ -211,7 +211,6 @@ liebs-picker-bbox > div {
     justify-content: center;
     align-items: flex-start;    
 
-    color: #0F0;
     background-color: rgba(0,128,0,0.2);
     border-radius: 4px;
     border: 2px solid #008000;
@@ -239,7 +238,16 @@ liebs-picker-bbox > .label {
     left: 0px;
     bottom: 0px;
     white-space: nowrap;
+    color: #fff;
     background-color: rgba(0,128,0,0.8);    
+}
+
+liebs-picker-bbox.hover > .label {
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    white-space: nowrap;
+    background-color: rgb(0, 192, 0.8);
 }
 
 .liebs-picker-modal:not(.segs-controls) .segs-control {
