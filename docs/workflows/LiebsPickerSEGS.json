@@ -1,8 +1,8 @@
 {
   "id": "f4584930-5e91-4494-9d6c-115852fd55cd",
   "revision": 0,
-  "last_node_id": 23,
-  "last_link_id": 38,
+  "last_node_id": 28,
+  "last_link_id": 46,
   "nodes": [
     {
       "id": 19,
@@ -22,7 +22,7 @@
         {
           "name": "image",
           "type": "IMAGE",
-          "link": 27
+          "link": 42
         },
         {
           "name": "segs",
@@ -85,7 +85,7 @@
         512,
         true,
         1024,
-        671408707099250,
+        346616665833691,
         "randomize",
         20,
         5,
@@ -115,7 +115,7 @@
         680
       ],
       "flags": {},
-      "order": 16,
+      "order": 18,
       "mode": 0,
       "inputs": [
         {
@@ -184,7 +184,7 @@
         512,
         true,
         1024,
-        155349454134061,
+        360332096513950,
         "randomize",
         20,
         5,
@@ -201,35 +201,6 @@
         false,
         false
       ]
-    },
-    {
-      "id": 16,
-      "type": "PreviewImage",
-      "pos": [
-        3210,
-        140
-      ],
-      "size": [
-        580,
-        650
-      ],
-      "flags": {},
-      "order": 17,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 30
-        }
-      ],
-      "outputs": [],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.29",
-        "Node name for S&R": "PreviewImage"
-      },
-      "widgets_values": []
     },
     {
       "id": 11,
@@ -260,7 +231,7 @@
           "name": "sam_model_opt",
           "shape": 7,
           "type": "SAM_MODEL",
-          "link": null
+          "link": 46
         },
         {
           "name": "segm_detector_opt",
@@ -293,44 +264,6 @@
         0,
         0.7,
         0
-      ]
-    },
-    {
-      "id": 12,
-      "type": "UltralyticsDetectorProvider",
-      "pos": [
-        1410,
-        10
-      ],
-      "size": [
-        280,
-        80
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "BBOX_DETECTOR",
-          "type": "BBOX_DETECTOR",
-          "links": [
-            10
-          ]
-        },
-        {
-          "name": "SEGM_DETECTOR",
-          "type": "SEGM_DETECTOR",
-          "links": null
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-impact-subpack",
-        "ver": "5809fcdcb93d38a63d347378c5df3382e3dfa484",
-        "Node name for S&R": "UltralyticsDetectorProvider"
-      },
-      "widgets_values": [
-        "bbox/face_yolov8m.pt"
       ]
     },
     {
@@ -388,7 +321,7 @@
         110
       ],
       "flags": {},
-      "order": 1,
+      "order": 0,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -508,7 +441,7 @@
         "Node name for S&R": "KSampler"
       },
       "widgets_values": [
-        830298383815183,
+        298954871195274,
         "randomize",
         35,
         5,
@@ -529,7 +462,7 @@
         100
       ],
       "flags": {},
-      "order": 2,
+      "order": 1,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -619,11 +552,222 @@
       "bgcolor": "#353"
     },
     {
+      "id": 16,
+      "type": "PreviewImage",
+      "pos": [
+        3210,
+        140
+      ],
+      "size": [
+        580,
+        650
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 30
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.29",
+        "Node name for S&R": "PreviewImage"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 17,
+      "type": "ImpactSEGSLabelFilter",
+      "pos": [
+        2210,
+        140
+      ],
+      "size": [
+        380,
+        132
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "segs",
+          "type": "SEGS",
+          "link": 40
+        }
+      ],
+      "outputs": [
+        {
+          "name": "filtered_SEGS",
+          "type": "SEGS",
+          "links": [
+            37,
+            44
+          ]
+        },
+        {
+          "name": "remained_SEGS",
+          "type": "SEGS",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-impact-pack",
+        "ver": "d900939861ded1ca09ba3ba1735d281810afe53d",
+        "Node name for S&R": "ImpactSEGSLabelFilter"
+      },
+      "widgets_values": [
+        "all",
+        "mean_face"
+      ]
+    },
+    {
+      "id": 27,
+      "type": "SEGSPreview",
+      "pos": [
+        2210,
+        1260
+      ],
+      "size": [
+        315,
+        314
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "segs",
+          "type": "SEGS",
+          "link": 45
+        },
+        {
+          "name": "fallback_image_opt",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "shape": 6,
+          "type": "IMAGE",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-impact-pack",
+        "ver": "d900939861ded1ca09ba3ba1735d281810afe53d",
+        "Node name for S&R": "SEGSPreview"
+      },
+      "widgets_values": [
+        true,
+        0.2
+      ]
+    },
+    {
+      "id": 18,
+      "type": "ImpactSEGSLabelFilter",
+      "pos": [
+        2210,
+        940
+      ],
+      "size": [
+        380,
+        132
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "segs",
+          "type": "SEGS",
+          "link": 41
+        }
+      ],
+      "outputs": [
+        {
+          "name": "filtered_SEGS",
+          "type": "SEGS",
+          "links": [
+            38,
+            45
+          ]
+        },
+        {
+          "name": "remained_SEGS",
+          "type": "SEGS",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-impact-pack",
+        "ver": "d900939861ded1ca09ba3ba1735d281810afe53d",
+        "Node name for S&R": "ImpactSEGSLabelFilter"
+      },
+      "widgets_values": [
+        "all",
+        "nice_face"
+      ]
+    },
+    {
+      "id": 26,
+      "type": "SEGSPreview",
+      "pos": [
+        2210,
+        460
+      ],
+      "size": [
+        315,
+        314
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "segs",
+          "type": "SEGS",
+          "link": 44
+        },
+        {
+          "name": "fallback_image_opt",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "shape": 6,
+          "type": "IMAGE",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-impact-pack",
+        "ver": "d900939861ded1ca09ba3ba1735d281810afe53d",
+        "Node name for S&R": "SEGSPreview"
+      },
+      "widgets_values": [
+        true,
+        0.2
+      ]
+    },
+    {
       "id": 15,
       "type": "ImpactImageBatchToImageList",
       "pos": [
-        1190,
-        -60
+        1410,
+        40
       ],
       "size": [
         315,
@@ -647,8 +791,8 @@
           "shape": 6,
           "type": "IMAGE",
           "links": [
-            16,
-            17
+            17,
+            39
           ]
         }
       ],
@@ -658,6 +802,146 @@
         "Node name for S&R": "ImpactImageBatchToImageList"
       },
       "widgets_values": []
+    },
+    {
+      "id": 12,
+      "type": "UltralyticsDetectorProvider",
+      "pos": [
+        1010,
+        -260
+      ],
+      "size": [
+        280,
+        80
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "BBOX_DETECTOR",
+          "type": "BBOX_DETECTOR",
+          "links": [
+            10
+          ]
+        },
+        {
+          "name": "SEGM_DETECTOR",
+          "type": "SEGM_DETECTOR",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-impact-subpack",
+        "ver": "5809fcdcb93d38a63d347378c5df3382e3dfa484",
+        "Node name for S&R": "UltralyticsDetectorProvider"
+      },
+      "widgets_values": [
+        "bbox/face_yolov8m.pt"
+      ]
+    },
+    {
+      "id": 28,
+      "type": "SAMLoader",
+      "pos": [
+        1010,
+        -140
+      ],
+      "size": [
+        280,
+        82
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "SAM_MODEL",
+          "type": "SAM_MODEL",
+          "links": [
+            46
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-impact-pack",
+        "ver": "d900939861ded1ca09ba3ba1735d281810afe53d",
+        "Node name for S&R": "SAMLoader"
+      },
+      "widgets_values": [
+        "sam_vit_b_01ec64.pth",
+        "AUTO"
+      ]
+    },
+    {
+      "id": 13,
+      "type": "LiebsPickerSEGS",
+      "pos": [
+        1810,
+        140
+      ],
+      "size": [
+        280,
+        202
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 39
+        },
+        {
+          "name": "segs",
+          "shape": 7,
+          "type": "SEGS",
+          "link": 14
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGES",
+          "type": "IMAGE",
+          "links": []
+        },
+        {
+          "name": "IMAGES",
+          "shape": 6,
+          "type": "IMAGE",
+          "links": [
+            42
+          ]
+        },
+        {
+          "name": "SEGS",
+          "shape": 6,
+          "type": "SEGS",
+          "links": [
+            40,
+            41
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "liebs-picker",
+        "ver": "af5e845b0e74f35927ae62f05cd390fb22c17561",
+        "Node name for S&R": "LiebsPickerSEGS"
+      },
+      "widgets_values": [
+        "1",
+        false,
+        "mean_face,nice_face",
+        "any",
+        true,
+        null,
+        null
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
     },
     {
       "id": 21,
@@ -696,123 +980,10 @@
         "Node name for S&R": "CLIPTextEncode"
       },
       "widgets_values": [
-        "1girl, red eyes, angry"
+        "1girl, red eyes, angry, shaded_face, brown hair"
       ],
       "color": "#232",
       "bgcolor": "#353"
-    },
-    {
-      "id": 13,
-      "type": "LiebsPickerSEGS",
-      "pos": [
-        1810,
-        140
-      ],
-      "size": [
-        280,
-        202
-      ],
-      "flags": {},
-      "order": 12,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 16
-        },
-        {
-          "name": "segs",
-          "shape": 7,
-          "type": "SEGS",
-          "link": 14
-        }
-      ],
-      "outputs": [
-        {
-          "name": "IMAGES",
-          "type": "IMAGE",
-          "links": []
-        },
-        {
-          "name": "IMAGES",
-          "shape": 6,
-          "type": "IMAGE",
-          "links": [
-            27
-          ]
-        },
-        {
-          "name": "SEGS",
-          "shape": 6,
-          "type": "SEGS",
-          "links": [
-            19,
-            20
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "liebs-picker",
-        "ver": "af5e845b0e74f35927ae62f05cd390fb22c17561",
-        "Node name for S&R": "LiebsPickerSEGS"
-      },
-      "widgets_values": [
-        "",
-        true,
-        "mean_face,nice_face",
-        "matching_suffix",
-        true,
-        null,
-        null
-      ],
-      "color": "#432",
-      "bgcolor": "#653"
-    },
-    {
-      "id": 17,
-      "type": "ImpactSEGSLabelFilter",
-      "pos": [
-        2210,
-        140
-      ],
-      "size": [
-        380,
-        132
-      ],
-      "flags": {},
-      "order": 13,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "segs",
-          "type": "SEGS",
-          "link": 19
-        }
-      ],
-      "outputs": [
-        {
-          "name": "filtered_SEGS",
-          "type": "SEGS",
-          "links": [
-            37
-          ]
-        },
-        {
-          "name": "remained_SEGS",
-          "type": "SEGS",
-          "links": null
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-impact-pack",
-        "ver": "d900939861ded1ca09ba3ba1735d281810afe53d",
-        "Node name for S&R": "ImpactSEGSLabelFilter"
-      },
-      "widgets_values": [
-        "all",
-        "mean_face"
-      ]
     },
     {
       "id": 22,
@@ -851,78 +1022,10 @@
         "Node name for S&R": "CLIPTextEncode"
       },
       "widgets_values": [
-        "1girl, blue eyes, smile"
+        "1girl, blue eyes, smile, brown hair"
       ],
       "color": "#232",
       "bgcolor": "#353"
-    },
-    {
-      "id": 18,
-      "type": "ImpactSEGSLabelFilter",
-      "pos": [
-        2210,
-        940
-      ],
-      "size": [
-        380,
-        132
-      ],
-      "flags": {},
-      "order": 14,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "segs",
-          "type": "SEGS",
-          "link": 20
-        }
-      ],
-      "outputs": [
-        {
-          "name": "filtered_SEGS",
-          "type": "SEGS",
-          "links": [
-            38
-          ]
-        },
-        {
-          "name": "remained_SEGS",
-          "type": "SEGS",
-          "links": null
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-impact-pack",
-        "ver": "d900939861ded1ca09ba3ba1735d281810afe53d",
-        "Node name for S&R": "ImpactSEGSLabelFilter"
-      },
-      "widgets_values": [
-        "all",
-        "nice_face"
-      ]
-    },
-    {
-      "id": 23,
-      "type": "Note",
-      "pos": [
-        1410,
-        -160
-      ],
-      "size": [
-        280,
-        88
-      ],
-      "flags": {},
-      "order": 3,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [],
-      "properties": {},
-      "widgets_values": [
-        "face_yolo8m detects 'face' SEGs."
-      ],
-      "color": "#432",
-      "bgcolor": "#653"
     }
   ],
   "links": [
@@ -1015,36 +1118,12 @@
       "IMAGE"
     ],
     [
-      16,
-      15,
-      0,
-      13,
-      0,
-      "IMAGE"
-    ],
-    [
       17,
       15,
       0,
       11,
       1,
       "IMAGE"
-    ],
-    [
-      19,
-      13,
-      2,
-      17,
-      0,
-      "SEGS"
-    ],
-    [
-      20,
-      13,
-      2,
-      18,
-      0,
-      "SEGS"
     ],
     [
       21,
@@ -1093,14 +1172,6 @@
       20,
       6,
       "CONDITIONING"
-    ],
-    [
-      27,
-      13,
-      1,
-      19,
-      0,
-      "IMAGE"
     ],
     [
       29,
@@ -1181,16 +1252,72 @@
       20,
       1,
       "SEGS"
+    ],
+    [
+      39,
+      15,
+      0,
+      13,
+      0,
+      "IMAGE"
+    ],
+    [
+      40,
+      13,
+      2,
+      17,
+      0,
+      "SEGS"
+    ],
+    [
+      41,
+      13,
+      2,
+      18,
+      0,
+      "SEGS"
+    ],
+    [
+      42,
+      13,
+      1,
+      19,
+      0,
+      "IMAGE"
+    ],
+    [
+      44,
+      17,
+      0,
+      26,
+      0,
+      "SEGS"
+    ],
+    [
+      45,
+      18,
+      0,
+      27,
+      0,
+      "SEGS"
+    ],
+    [
+      46,
+      28,
+      0,
+      11,
+      2,
+      "SAM_MODEL"
     ]
   ],
   "groups": [],
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.5209868481925544,
+      "scale": 0.4305676431343524,
       "offset": [
-        506.15950509504205,
-        689.4337625853757
+        180.65563966843874,
+        673.3881194855873
       ]
     },
     "frontendVersion": "1.16.8"
