@@ -38,7 +38,7 @@ app.registerExtension({
             { text: 'Always', value: 'always' },
             { text: 'On single image', value: 'single' }
         ],
-        tooltip: 'Modal will open directly to single image view',
+        tooltip: 'Modal will open directly to single image view'
     },{
         category: ['Liebs Picker', 'Selection', 'Selection Style'],
         id: 'ImagePicker.PickerMode',
@@ -60,7 +60,13 @@ app.registerExtension({
         name: 'Pass images mode requires a selection',
         type: 'boolean',
         defaultValue: true,
-        tooltip: 'Require an image to be selected in pass mode',
+        tooltip: 'Require an image to be selected in pass mode'
+    },{
+        category: ['Liebs Picker', 'SEGS', 'Change Label Selects Image'],
+        id: 'ImagePicker.CycleLabelPicksImage',
+        name: 'Changing the SEG label on an image selects the image',
+        type: 'boolean',
+        defaultValue: false
     }],
     setup() {
         // Inject the styles for this extension.
@@ -93,7 +99,8 @@ app.registerExtension({
                 pickerModeMustPick: extensionSettings.get('ImagePicker.PickerModeMustPick'),
                 pickerLocked: detail.locked,
                 segsControls: detail.features.includes('segs-controls'),
-                showSegments: detail.segs_on
+                showSegments: detail.segs_on,
+                cycleLabelPicks: extensionSettings.get('ImagePicker.CycleLabelPicksImage')
             });
 
             const openZoomed = extensionSettings.get('ImagePicker.OpenZoomed'),

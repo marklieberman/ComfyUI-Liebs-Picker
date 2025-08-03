@@ -50,6 +50,7 @@ export class GridModal extends BaseModal {
 
         this.handlerImageListSelect = this.onImageListSelectOrUnwanted.bind(this);
         this.handlerImageListUnwanted = this.onImageListSelectOrUnwanted.bind(this);        
+        this.handlerSegmentChange = this.onSegmentChange.bind(this);        
 
         this.handlerImageClick = this.onImageClick.bind(this);
         this.handlerImageAction = this.onImageAction.bind(this);
@@ -82,6 +83,7 @@ export class GridModal extends BaseModal {
         if (this.segsControls) {
             this.classList.add("segs-controls");
             this.displaySegments(options.showSegments ?? true);
+            this.cycleLabelPicks = options.cycleLabelPicks ?? false;
         } else {
             this.displaySegments(false);
         }
@@ -327,6 +329,7 @@ export class GridModal extends BaseModal {
         this.lastFocusCoords = null;
         value.addEventListener('image-select', this.handlerImageListSelect);
         value.addEventListener('image-unwanted', this.handlerImageListUnwanted);
+        value.addEventListener('segment-change', this.handlerSegmentChange);
 
         // Populate the grid of images.
         this.el.imageList.innerText = '';
@@ -449,6 +452,14 @@ export class GridModal extends BaseModal {
         }
     }
 
+    // Invoked when a segment is changed.
+    onSegmentChange(event) {
+        if (this.attached && this.cycleLabelPicks) {
+            const detail = event.detail;
+            detail.imageList.select(detail.index, true);
+        }
+    }
+
     // Invoked when the Send button is clicked.
     onSend() {
         this.remove();
@@ -471,7 +482,8 @@ export class GridModal extends BaseModal {
             imageList: this.imageList,
             index,
             segsControls: this.segsControls,
-            showSegments: this.isSegmentsVisible()
+            showSegments: this.isSegmentsVisible(),
+            cycleLabelPicks: this.cycleLabelPicks
         });
 
         this.detach();

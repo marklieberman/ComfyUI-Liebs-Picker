@@ -19,6 +19,19 @@ export class ImageList extends EventTarget {
             };
 
             this.items.push(item);
+
+            // Propagate events from the image segments.
+            item.segments.addEventListener('segment-change', event => {
+                this.dispatchEvent(new CustomEvent('segment-change', {
+                    detail: {
+                        imageList: this,
+                        image: item,                        
+                        index: i,
+                        segn: event.detail.segn,
+                        label: event.detail.label
+                    }
+                }));
+            });
         }
     }
 

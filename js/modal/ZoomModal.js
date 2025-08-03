@@ -93,6 +93,7 @@ export class ZoomModal extends BaseModal {
 
         this.handlerImageListSelect = this.onImageListSelectOrUnwanted.bind(this);        
         this.handlerImageListUnwanted = this.onImageListSelectOrUnwanted.bind(this);
+        this.handlerSegmentChange = this.onSegmentChange.bind(this);        
 
         this.handlerImageIndex = this.onImageIndex.bind(this);
         this.el.image.addEventListener('image-index', this.handlerImageIndex);
@@ -127,6 +128,7 @@ export class ZoomModal extends BaseModal {
         if (this.segsControls) {
             this.classList.add("segs-controls");
             this.displaySegments(options.showSegments ?? true);
+            this.cycleLabelPicks = options.cycleLabelPicks ?? false;
         } else {
             this.displaySegments(false);
         }
@@ -295,6 +297,7 @@ export class ZoomModal extends BaseModal {
         this.el.image.setImageList(value, index);                
         value.addEventListener('image-select', this.handlerImageListSelect);
         value.addEventListener('image-unwanted', this.handlerImageListUnwanted);
+        value.addEventListener('segment-change', this.handlerSegmentChange);
     }
 
     // Set the index of the image to display from the image list.
@@ -414,6 +417,14 @@ export class ZoomModal extends BaseModal {
 
         this.el.image.setIndex(lastIndex);
         this.setSubtitle();
+    }
+
+    // Invoked when a segment is changed.
+    onSegmentChange(event) {
+        if (this.cycleLabelPicks) {
+            const detail = event.detail;
+            detail.imageList.select(detail.index, true);
+        }
     }
 
     // Invoked when the Send button is clicked.
