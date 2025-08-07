@@ -1,20 +1,37 @@
 import { api } from "../../scripts/api.js";
+import { Segments } from "./Segments.js";
 
 /**
  * A list of images to display and their selected state.
  */
 export class ImageList extends EventTarget {
     
-    constructor(comfyUrls) {
+    constructor(imageList) {
         super();
 
-        this.items = [];        
-        for (const url of comfyUrls) {
-            this.items.push({
-                url,
+        this.items = [];
+        for (let i = 0; i < imageList.length; i++) {
+            let item = {
+                url: imageList[i].url,
+                segments: new Segments(imageList[i].segments),
                 selected: false,
                 unwanted: false
-            })
+            };
+
+            this.items.push(item);
+
+            // Propagate events from the image segments.
+            item.segments.addEventListener('segment-change', event => {
+                this.dispatchEvent(new CustomEvent('segment-change', {
+                    detail: {
+                        imageList: this,
+                        image: item,                        
+                        index: i,
+                        segn: event.detail.segn,
+                        label: event.detail.label
+                    }
+                }));
+            });
         }
     }
 
@@ -110,4 +127,63 @@ export class ImageList extends EventTarget {
         this.unwanted(index, unwanted);
         return unwanted;
     }
+
+    // Get the segment information for the image at index.
+    getImageSegments(index) {
+        return this.items[index].segments;
+    }
+
+    // Applied a selection by selecting or unwanting by index.
+    selectAndLock(selected, locked) {
+        if (selected === 'all') {
+            for (const item of this.items) {
+                item.selected = !locked;                
+            }
+        } else
+        if (selected === 'none') {
+            for (const item of this.items) {
+                item.selected = false;                
+            }
+        } else {
+            // Parse the selection into an array of indexes.
+            selected = selected.split(',')
+                .map(i => Number.parseInt(i))
+                .filter(i => Number.isFinite(i))
+                // Convert 1-based list to 0-based index.
+                .map(i => i - 1)
+                .filter(i => (i >= 0) && (i < this.items.length))
+
+            if (selected.length) {
+                // When the selection is locked, instead of picking the selected items - unwant the unselected items.
+                for (let i = 0; i < this.items.length; i++) {
+                    let isSelected = selected.includes(i);
+                    if (isSelected && !locked) {
+                        this.select(i, true);
+                    } else
+                    if (!isSelected && locked) {
+                        this.unwanted(i, true);
+                    }
+                }
+            }
+        }
+        
+    }
+
+    // Get the list of images to pass and segment labels.
+    getResult() {
+        const result = []
+        const filterMode = this.selectedCount === 0;        
+        for (const [i, item] of Object.entries(this.items)) {
+            if (item.selected || (filterMode && !item.unwanted)) {
+                result.push({
+                    index: Number(i),
+                    segments: {
+                        label: item.segments.label
+                    }
+                })
+            }
+        }
+        return result;
+    }
+
 }

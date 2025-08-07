@@ -1,16 +1,24 @@
 import { BaseModal } from "./BaseModal.js";
-import { ImageListImageElement } from "../ImageListImageElement.js";
 import { ZoomModal } from "./ZoomModal.js";
+import { ImageListImageElement } from "../element/ImageListImageElement.js";
 
 const MODAL_HTML = `
     <header>
         <h1>Image Picker</h1>
-        <div class="p-component">
+        <div class="spacer"></div>
+        <div class="p-component toggle-switch segs-control segs-switch">
+            SEGS
+            <label class="switch">
+                <input type="checkbox">
+                <span class="slider"></span>                
+            </label>            
+        </div>
+        <div class="p-component">            
             <button class="p-button p-button-secondary cancel-button">Cancel</button>
             <button class="p-button p-button-primary send-button">Send</button>
         </div>
     </header>
-    <content>
+    <content class="hide-segments">
         <div class="image-list"><div>
     <content>   
 `;
@@ -27,6 +35,7 @@ export class GridModal extends BaseModal {
         this.innerHTML = MODAL_HTML;
         this.el = {
             title: this.querySelector('header h1'),
+            segsCheckbox: this.querySelector('.segs-switch input'),
             sendButton: this.querySelector('.send-button'),
             cancelButton: this.querySelector('.cancel-button'),
             content: this.querySelector('content'),
@@ -41,21 +50,43 @@ export class GridModal extends BaseModal {
 
         this.handlerImageListSelect = this.onImageListSelectOrUnwanted.bind(this);
         this.handlerImageListUnwanted = this.onImageListSelectOrUnwanted.bind(this);        
+        this.handlerSegmentChange = this.onSegmentChange.bind(this);        
 
         this.handlerImageClick = this.onImageClick.bind(this);
         this.handlerImageAction = this.onImageAction.bind(this);
         this.handlerImageMouseDown = this.onImageMouseDown.bind(this);        
         this.handlerImageMouseEnter = this.onImageMouseEnter.bind(this);
         this.handlerImageMouseLeave = this.onImageMouseLeave.bind(this);
-        this.handlerImageFocus = this.onImageFocus.bind(this);        
+        this.handlerImageFocus = this.onImageFocus.bind(this);       
+        
+        this.el.segsCheckbox.addEventListener('click', () => {
+            this.displaySegments(this.el.segsCheckbox.checked);
+        });
 
         // Initialize the modal controls.
         this.mouseOverImage = null;
         this.pickerMode = options.pickerMode ?? 'picker';
         this.pickerModeMustPick = options.pickerModeMustPick ?? false;
+        this.pickerLocked = options.pickerLocked ?? false;
         this.setTitle(options.title);
         this.setImageList(options.imageList);
+
+        if (this.pickerLocked) {
+            this.classList.add("picker-locked");
+            this.pickerModeMustPick = false;
+        }
+
         this.updateSendButton();
+
+        // Display SEGS controls when features are enabled.
+        this.segsControls = options.segsControls ?? false;
+        if (this.segsControls) {
+            this.classList.add("segs-controls");
+            this.displaySegments(options.showSegments ?? true);
+            this.cycleLabelPicks = options.cycleLabelPicks ?? false;
+        } else {
+            this.displaySegments(false);
+        }
     }
 
     // Prepare a grid style layout.
@@ -144,18 +175,27 @@ export class GridModal extends BaseModal {
         let n = parseInt(event.key);
         if (Number.isInteger(n)) {
             n = (n === 0) ? 9 : n - 1;
-            if (n < this.imageList.length) {
-                handled = true;
-                switch (this.pickerMode) {
-                    case 'picker':
-                        this.imageList.toggleSelect(n);
-                        this.imageList.unwanted(n, false);
-                        break;
-                    case 'filter':
-                        this.imageList.select(n, false);
-                        this.imageList.toggleUnwanted(n);
-                        break;
-                }                
+            if (event.altKey) {
+                if (this.segsControls && this.isSegmentsVisible()) {
+                    // Cycle segment labels of the Nth segment of the focused image when alt-key is pressed.
+                    const index = getFocusedIndex() ?? 0;
+                    this.imageList.getImageSegments(index)?.nextLabel(n);
+                }
+            } else
+            if (!this.pickerLocked) {
+                if (n < this.imageList.length) {
+                    handled = true;
+                    switch (this.pickerMode) {
+                        case 'picker':
+                            this.imageList.toggleSelect(n);
+                            this.imageList.unwanted(n, false);
+                            break;
+                        case 'filter':
+                            this.imageList.select(n, false);
+                            this.imageList.toggleUnwanted(n);
+                            break;
+                    }
+                }
             }
         } else         
         // Cancel the modal with Escape.
@@ -200,7 +240,7 @@ export class GridModal extends BaseModal {
             this.el.imageList.lastChild.focus();
         } else
         // Select an image with E or /.
-        if (letterKey === 'E' || letterKey === '/') {
+        if (!this.pickerLocked && (letterKey === 'E' || letterKey === '/')) {
             handled = true;            
             const index = getFocusedIndex() ?? 0;
             switch (this.pickerMode) {
@@ -215,7 +255,7 @@ export class GridModal extends BaseModal {
             }
         } else
         // Unwant an image with X or '.
-        if (letterKey === 'X' || letterKey === '\'') {
+        if (!this.pickerLocked && (letterKey === 'X' || letterKey === '\'')) {
             handled = true;
             const index = getFocusedIndex() ?? 0;            
             switch (this.pickerMode) {
@@ -228,7 +268,7 @@ export class GridModal extends BaseModal {
                     this.imageList.unwanted(index, false);
                     break;
             }
-        }
+        } else
         // Zoom an image with spacebar.
         if ((event.key === ' ')) {            
             handled = true;
@@ -246,6 +286,10 @@ export class GridModal extends BaseModal {
             }
 
             this.switchToZoomModal(index);
+        } else
+        // Toggle visibility of the segments overlay.
+        if (this.segsControls && (event.key === '`') && event.altKey) {
+            this.displaySegments(!this.isSegmentsVisible());
         }
 
         if (handled) {
@@ -267,13 +311,17 @@ export class GridModal extends BaseModal {
             mustPick = (this.pickerMode === 'picker') && this.pickerModeMustPick;
 
         if ((selectedCount > 0) || mustPick) {
-            this.el.sendButton.innerText = `Send (${selectedCount} selected)`;
             this.el.sendButton.disabled = selectedCount < 1;
+            this.el.sendButton.innerText = `Send (${selectedCount} selected)`;
         } else {
-            this.el.sendButton.innerText = `Send (${wantedCount} remaining)`;
             this.el.sendButton.disabled = wantedCount < 1;
+            if (this.pickerLocked) {
+                this.el.sendButton.innerText = `Send (${wantedCount} selected)`;
+            } else {
+                this.el.sendButton.innerText = `Send (${wantedCount} remaining)`;
+            }
         }
-    }  
+    }
 
     // Set the list of images to display.
     setImageList(value) {
@@ -281,6 +329,7 @@ export class GridModal extends BaseModal {
         this.lastFocusCoords = null;
         value.addEventListener('image-select', this.handlerImageListSelect);
         value.addEventListener('image-unwanted', this.handlerImageListUnwanted);
+        value.addEventListener('segment-change', this.handlerSegmentChange);
 
         // Populate the grid of images.
         this.el.imageList.innerText = '';
@@ -298,6 +347,22 @@ export class GridModal extends BaseModal {
         }
     }
 
+    // True if segments overlay is visible, otherwise false.
+    isSegmentsVisible() {
+        return !this.el.content.classList.contains('hide-segments');
+    }
+
+    // Set visibility of the segments overlay.
+    displaySegments(value) {
+        this.showSegments = value;
+        this.el.segsCheckbox.checked = value;
+        if (value) {
+            this.el.content.classList.remove('hide-segments');
+        } else {
+            this.el.content.classList.add('hide-segments');
+        }
+    }
+
     // Invoked when the selection or unwanted flag in the image list changes.
     onImageListSelectOrUnwanted() {
         this.updateSendButton();
@@ -307,15 +372,17 @@ export class GridModal extends BaseModal {
     onImageClick(event) {
         const detail = event.detail;
 
-        switch (this.pickerMode) {
-            case 'picker':
-                this.imageList.toggleSelect(detail.index);
-                this.imageList.unwanted(detail.index, false);
-                break;
-            case 'filter':
-                this.imageList.select(detail.index, false);
-                this.imageList.toggleUnwanted(detail.index);
-                break;
+        if (!this.pickerLocked) {
+            switch (this.pickerMode) {
+                case 'picker':
+                    this.imageList.toggleSelect(detail.index);
+                    this.imageList.unwanted(detail.index, false);
+                    break;
+                case 'filter':
+                    this.imageList.select(detail.index, false);
+                    this.imageList.toggleUnwanted(detail.index);
+                    break;
+            }
         }
         
         // Reset focus back to the modal to avoid focus outlines on the images when not using keyboard.
@@ -326,15 +393,17 @@ export class GridModal extends BaseModal {
     onImageAction(event) {
         const detail = event.detail;   
                  
-        switch (detail.action) {
-            case 'select':
-                this.imageList.toggleSelect(detail.index);
-                this.imageList.unwanted(detail.index, false);
-                break;
-            case 'unwanted':
-                this.imageList.select(detail.index, false);
-                this.imageList.toggleUnwanted(detail.index);
-                break;            
+        if (!this.pickerLocked) {
+            switch (detail.action) {
+                case 'select':
+                    this.imageList.toggleSelect(detail.index);
+                    this.imageList.unwanted(detail.index, false);
+                    break;
+                case 'unwanted':
+                    this.imageList.select(detail.index, false);
+                    this.imageList.toggleUnwanted(detail.index);
+                    break;            
+            }
         }
     }
 
@@ -383,6 +452,14 @@ export class GridModal extends BaseModal {
         }
     }
 
+    // Invoked when a segment is changed.
+    onSegmentChange(event) {
+        if (this.attached && this.cycleLabelPicks) {
+            const detail = event.detail;
+            detail.imageList.select(detail.index, true);
+        }
+    }
+
     // Invoked when the Send button is clicked.
     onSend() {
         this.remove();
@@ -392,7 +469,7 @@ export class GridModal extends BaseModal {
     // Invoked when the Cancel button is clicked.
     onCancel() {
         this.detach();
-        this.resolve('cancal');
+        this.resolve('cancel');
     }
 
     // Switch to the zoom modal.
@@ -401,12 +478,19 @@ export class GridModal extends BaseModal {
             title: this.title,
             pickerMode: this.pickerMode,
             pickerModeMustPick: this.pickerModeMustPick,
+            pickerLocked: this.pickerLocked,
             imageList: this.imageList,
-            index
+            index,
+            segsControls: this.segsControls,
+            showSegments: this.isSegmentsVisible(),
+            cycleLabelPicks: this.cycleLabelPicks
         });
 
         this.detach();
         await zoomModal.attach();
+
+        // Copy any shared setting back from the modal.
+        this.displaySegments(zoomModal.showSegments);
 
         switch (await zoomModal.result) {
             case 'back': 

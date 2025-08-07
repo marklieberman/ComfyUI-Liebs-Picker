@@ -22,7 +22,7 @@ if (pickerTabId) {
 }
 
 // Python node type.
-const NODE_TYPE = 'LiebsPicker';
+const NODE_TYPES = [ 'LiebsPicker', 'LiebsPickerSEGS' ];
 
 // Register the ComfyUI extension.
 app.registerExtension({
@@ -38,7 +38,7 @@ app.registerExtension({
             { text: 'Always', value: 'always' },
             { text: 'On single image', value: 'single' }
         ],
-        tooltip: 'Modal will open directly to single image view',
+        tooltip: 'Modal will open directly to single image view'
     },{
         category: ['Liebs Picker', 'Selection', 'Selection Style'],
         id: 'ImagePicker.PickerMode',
@@ -60,7 +60,13 @@ app.registerExtension({
         name: 'Pass images mode requires a selection',
         type: 'boolean',
         defaultValue: true,
-        tooltip: 'Require an image to be selected in pass mode',
+        tooltip: 'Require an image to be selected in pass mode'
+    },{
+        category: ['Liebs Picker', 'SEGS', 'Change Label Selects Image'],
+        id: 'ImagePicker.CycleLabelPicksImage',
+        name: 'Changing the SEG label on an image selects the image',
+        type: 'boolean',
+        defaultValue: false
     }],
     setup() {
         // Inject the styles for this extension.
@@ -81,14 +87,20 @@ app.registerExtension({
             }
 
             // Contains the list of images and their selection status.
-            const imageList = new ImageList(detail.urls);
+            const imageList = new ImageList(detail.images);
+            imageList.selectAndLock(detail.selected, detail.locked);
+            console.log("picker detail", detail);
             
             // Show the modal.
             const modal = new GridModal({
                 title: detail.title,
                 imageList,
                 pickerMode: extensionSettings.get('ImagePicker.PickerMode'),
-                pickerModeMustPick: extensionSettings.get('ImagePicker.PickerModeMustPick')
+                pickerModeMustPick: extensionSettings.get('ImagePicker.PickerModeMustPick'),
+                pickerLocked: detail.locked,
+                segsControls: detail.features.includes('segs-controls'),
+                showSegments: detail.segs_on,
+                cycleLabelPicks: extensionSettings.get('ImagePicker.CycleLabelPicksImage')
             });
 
             const openZoomed = extensionSettings.get('ImagePicker.OpenZoomed'),
@@ -102,26 +114,26 @@ app.registerExtension({
             }
 
             // Wait for the modal to be resolved.            
-            const body = new FormData();
-            body.append('picker_tab_id', detail.picker_tab_id);
+            const body = {
+                'picker_tab_id': detail.picker_tab_id
+            };
             switch(await modal.result) {
                 case 'send': 
-                    body.append('result', 'send');
-                    body.append('selection', imageList.selectedIndexes.join(','));
+                    body.result = 'send';
+                    body.selection = imageList.getResult()
                     break;
                 case 'cancel': 
-                    body.append('result', 'cancel');
-                    body.append('selection', '');
+                    body.result = 'cancel';
                     break;
             };
             api.fetchApi('/liebs-picker-message', { 
                 method: 'POST', 
-                body 
+                body: JSON.stringify(body) 
             });
         });
     },
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
-        if (nodeType.comfyClass === NODE_TYPE) { 
+        if (NODE_TYPES.includes(nodeType.comfyClass)) { 
             const onNodeCreated = nodeType.prototype.onNodeCreated;
             nodeType.prototype.onNodeCreated = function () {     
                 const r = onNodeCreated?.apply(this, arguments);
