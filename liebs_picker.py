@@ -38,7 +38,7 @@ class LiebsPickerSEGS(PreviewImage):
                 "selected": ("STRING", { "default": "none", "tooltip":"Comma-separated list of image indexes to select, 'all', or 'none'" }),
                 "locked": ("BOOLEAN", { "default": False, "tooltip": "Prevent selected images from being changed" }),
                 "segs": ("SEGS", { "tooltip": "SEGS to display over the images" }),
-                "segs_labels": ("STRING", { "tooltip":"Comma-separated list of possible labels for segments" }),
+                "segs_labels": ("STRING", {  "multiline":True, "tooltip":"Comma-separated list of possible labels for segments" }),
                 "segs_label_mode": ([ 
                     "any",             # Pick any label and no initial pick.
                     "matching_prefix", # Pick from labels with matching prefix and initialize to first match.

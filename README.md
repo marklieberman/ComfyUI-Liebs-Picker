@@ -46,7 +46,7 @@ A node to pause execution of the workflow and select which input images should p
 
 * Mouse-wheel, Left/Right arrow keys, or AD keys to navigate between images in single image view.
 
-### Image Picker (SEGS)
+## Image Picker (SEGS)
 
 See: [LiebsPickerSEGS.json](./docs/workflows/LiebsPickerSEGS.json) for an example workflow.
 
