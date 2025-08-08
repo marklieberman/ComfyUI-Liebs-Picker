@@ -25,16 +25,12 @@ export class BBoxOverlayElement extends HTMLElement {
         this.addEventListener('mousemove', event => {
             // Remove hover style from all bboxes.
             for (const bbox of this.el.bboxes) {                
-                bbox.classList.remove('hover');
+                bbox.classList.remove('hover');                
             }
 
             // Update hover styles for the bbox under the mouse.
-            this.testPoint(event.clientX, event.clientY, (bbox, inside) => {
-                if (inside) {
-                    bbox.classList.add('hover');
-                } else {
-                    bbox.classList.remove('hover');
-                }
+            this.testPoint(event.clientX, event.clientY, (insideBbox) => {
+                insideBbox.classList.add('hover');
             });
         }, { capture: true });
 
@@ -42,16 +38,14 @@ export class BBoxOverlayElement extends HTMLElement {
             // Handle clicks on the bbox under the mouse.
             if (event.button === 0 || event.button === 2) {
                 // Update hover styles for the bbox under the mouse.
-                this.testPoint(event.clientX, event.clientY, (bbox, inside) => {
-                    if (inside) {
-                        this.onBBoxClick({
-                            detail: {
-                                button: event.button,
-                                segn: this.el.bboxes.indexOf(bbox),
-                                bbox
-                            }
-                        });
-                    }
+                this.testPoint(event.clientX, event.clientY, (bbox) => {
+                    this.onBBoxClick({
+                        detail: {
+                            button: event.button,
+                            segn: this.el.bboxes.indexOf(bbox),
+                            bbox
+                        }
+                    });
                 });
 
                 event.preventDefault();
@@ -63,11 +57,9 @@ export class BBoxOverlayElement extends HTMLElement {
 
         // Prevent the clicks from being propagated.
         this.addEventListener('click', event => {
-            this.testPoint(event.clientX, event.clientY, (bbox, inside) => {
-                if (inside) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
+            this.testPoint(event.clientX, event.clientY, (insideBbox) => {
+                event.preventDefault();
+                event.stopPropagation();
             });
         }, { capture: true });
 
@@ -81,7 +73,7 @@ export class BBoxOverlayElement extends HTMLElement {
     }
 
     testPoint (clientX, clientY, callback) {
-        for (const bbox of document.elementsFromPoint(event.clientX, event.clientY)) {
+        for (const bbox of document.elementsFromPoint(clientX, clientY)) {
             if (bbox === this) {
                 // Reached the overlay container.
                 return;
@@ -89,8 +81,10 @@ export class BBoxOverlayElement extends HTMLElement {
 
             if (bbox instanceof BBoxElement) {
                 // Bounding box at the top of the stack.
-                callback(bbox, bbox.isPointInsideMask(clientX, clientY));
-                return;
+                if(bbox.isPointInsideMask(clientX, clientY)) {
+                    callback(bbox);
+                    return;
+                }
             }
         }
     }
