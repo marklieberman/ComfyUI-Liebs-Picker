@@ -80,6 +80,10 @@ This node was developed using the techniques from [cg-image-filter](https://gith
 
 ## Changelog
 
+__1.2.1__
+
+* Fix hit detection of overlapping bboxes and masks.
+
 __1.2.0__
 
 * Implemented the `Image Picker (SEGS)` node.
