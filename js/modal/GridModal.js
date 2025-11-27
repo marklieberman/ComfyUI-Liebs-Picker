@@ -488,11 +488,12 @@ export class GridModal extends BaseModal {
 
         this.detach();
         await zoomModal.attach();
+        let result = await zoomModal.result
 
         // Copy any shared setting back from the modal.
-        this.displaySegments(zoomModal.showSegments);
+        this.displaySegments(zoomModal.isSegmentsVisible());
 
-        switch (await zoomModal.result) {
+        switch (result) {
             case 'back': 
                 // Back to the grid view.
                 await this.attach();
