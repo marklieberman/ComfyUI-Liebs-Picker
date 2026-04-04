@@ -21,6 +21,8 @@ export class BaseModal extends HTMLElement {
         window.addEventListener('resize', this.handlerResize);
         this.handlerKeyDown = this.onKeyDown.bind(this);
         this.addEventListener('keydown', this.handlerKeyDown);
+        this.handlerKeyUp = this.onKeyUp.bind(this);
+        this.addEventListener('keyup', this.handlerKeyUp);
 
         // Allows the modal element to recieve focus.
         this.classList.add('liebs-picker-modal');
@@ -74,5 +76,8 @@ export class BaseModal extends HTMLElement {
 
     // Handle keydown in the modal.
     onKeyDown() { }
+
+    // Handle keyup in the modal.
+    onKeyUp() { }
 
 }

@@ -64,6 +64,7 @@ export class GridModal extends BaseModal {
         });
 
         // Initialize the modal controls.
+        this.pressedKeys = new Set();
         this.mouseOverImage = null;
         this.pickerMode = options.pickerMode ?? 'picker';
         this.pickerModeMustPick = options.pickerModeMustPick ?? false;
@@ -160,6 +161,7 @@ export class GridModal extends BaseModal {
         let handled = false;
 
         const letterKey = event.key.toUpperCase();
+        this.pressedKeys.add(letterKey);
 
         // Get the index of the image with focus.        
         const getFocusedIndex = () => {
@@ -175,11 +177,15 @@ export class GridModal extends BaseModal {
         let n = parseInt(event.key);
         if (Number.isInteger(n)) {
             n = (n === 0) ? 9 : n - 1;
-            if (event.altKey) {
-                if (this.segsControls && this.isSegmentsVisible()) {
-                    // Cycle segment labels of the Nth segment of the focused image when alt-key is pressed.
-                    const index = getFocusedIndex() ?? 0;
-                    this.imageList.getImageSegments(index)?.nextLabel(n);
+            if (event.altKey && this.segsControls && this.isSegmentsVisible()) {
+                const index = getFocusedIndex() ?? 0,
+                      segments = this.imageList.getImageSegments(index);
+                if (this.pressedKeys.has('X')) {
+                    // Alt+X+{n} shortcut to unwant a segment of the focused image.
+                    segments?.toggleUnwanted(n);
+                } else {
+                    // Alt+{n} to cycle the Nth segment label of the focused image.
+                    segments?.nextLabel(n);
                 }
             } else
             if (!this.pickerLocked) {
@@ -255,7 +261,7 @@ export class GridModal extends BaseModal {
             }
         } else
         // Unwant an image with X or '.
-        if (!this.pickerLocked && (letterKey === 'X' || letterKey === '\'')) {
+        if (!this.pickerLocked && !event.altKey && (letterKey === 'X' || letterKey === '\'')) {
             handled = true;
             const index = getFocusedIndex() ?? 0;            
             switch (this.pickerMode) {
@@ -296,6 +302,12 @@ export class GridModal extends BaseModal {
             event.preventDefault();
             event.stopPropagation();
         }
+    }
+
+    // Handle keyup in the modal.
+    onKeyUp(event) {
+        const letterKey = event.key.toUpperCase();
+        this.pressedKeys.delete(letterKey);
     }
 
     // Set the modal title.

@@ -12,7 +12,8 @@ export class Segments extends EventTarget {
         this.bboxes = [];
         this.label = [];
         this.labels = [];
-        this.masks = [];
+        this.masks = [];        
+        this.unwanted = [];
 
         for (const seg of segments) {
             this.sizes.push(seg.size);
@@ -20,6 +21,7 @@ export class Segments extends EventTarget {
             this.label.push(seg.label || 'unknown');
             this.labels.push(seg.labels || []);
             this.masks.push(seg.mask);
+            this.unwanted.push(seg.unwanted);
         }
     }
 
@@ -32,6 +34,13 @@ export class Segments extends EventTarget {
         return null;
     }
 
+    // Get the resulting array of labels for segments.
+    getResult () {
+        return this.label.map((label, index) => {
+            return this.unwanted[index] ? 'unwanted' : label;
+        });
+    }
+
     nextLabel(segn, offset = 1) {
         const labels = this.labels[segn];
 
@@ -42,11 +51,25 @@ export class Segments extends EventTarget {
             index = labels.length - 1;
         }
         this.label[segn] = labels[index];
+        this.unwanted[segn] = false;
 
         this.dispatchEvent(new CustomEvent('segment-change', {
             detail: {
                 segn,
-                label: this.label[segn]
+                label: this.label[segn],
+                unwanted: this.unwanted[segn]
+            }
+        }));
+    }
+
+    toggleUnwanted(segn) {
+        this.unwanted[segn] = !this.unwanted[segn];
+        
+        this.dispatchEvent(new CustomEvent('segment-change', {
+            detail: {
+                segn,
+                label: this.label[segn],
+                unwanted: this.unwanted[segn]
             }
         }));
     }

@@ -47,7 +47,6 @@ export class BBoxElement extends HTMLElement {
                 context.drawImage(image, 0, 0);
             }
             image.src = maskUrl;
-
         }
     }
 
@@ -75,7 +74,15 @@ export class BBoxElement extends HTMLElement {
 
     setLabel(value) {
         // Set the index corresponding to the keys that cycle the label.
-        this.el.label.innerText = `${String(this.segn + 1)}: ${value}`
+        this.el.label.innerText = `${String(this.segn + 1)}: ${value}`        
+    }
+
+    setUnwanted(value) {        
+        if (value) {
+            this.classList.add('unwanted');
+        } else {
+            this.classList.remove('unwanted');
+        }
     }
 
 }

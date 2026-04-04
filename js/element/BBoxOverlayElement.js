@@ -41,7 +41,9 @@ export class BBoxOverlayElement extends HTMLElement {
                 this.testPoint(event.clientX, event.clientY, (bbox) => {
                     this.onBBoxClick({
                         detail: {
+                            eventName: 'mouseup',
                             button: event.button,
+                            buttons: event.buttons,
                             segn: this.el.bboxes.indexOf(bbox),
                             bbox
                         }
@@ -104,11 +106,13 @@ export class BBoxOverlayElement extends HTMLElement {
                 const sizes = this.segments.sizes[segn],
                       bbox = this.segments.bboxes[segn],
                       label = this.segments.label[segn],
+                      unwanted = this.segments.unwanted[segn],
                       maskUrl = this.segments.getMaskUrl(segn);
 
                 const bboxElement = new BBoxElement(segn, sizes, bbox, maskUrl);
                 bboxElement.addEventListener('bbox-mousedown', this.bboxClickHandler);
-                bboxElement.setLabel(label);                
+                bboxElement.setLabel(label);     
+                bboxElement.setUnwanted(unwanted);
 
                 this.el.bboxes.push(bboxElement);
                 this.appendChild(bboxElement);
@@ -117,19 +121,28 @@ export class BBoxOverlayElement extends HTMLElement {
     }
 
     onSegmentChange(event) {
-        const detail = event.detail;
-        this.el.bboxes[detail.segn].setLabel(detail.label);
+        const detail = event.detail,
+              bbox = this.el.bboxes[detail.segn];
+        
+        bbox.setLabel(detail.label);
+        bbox.setUnwanted(detail.unwanted);
     }
 
     onBBoxClick(event) {
         const detail = event.detail;
-        switch (detail.button) {
-            case 0:
-                this.segments.nextLabel(detail.segn, 1);
-                break;
-            case 2:
-                this.segments.nextLabel(detail.segn, -1);
-                break;
+        if ((detail.buttons | detail.button) === 3) {
+            // Left-right or right-left chord.
+            this.segments.toggleUnwanted(detail.segn);
+        } else {
+            // Releasing a single button.
+            switch (detail.button) {
+                case 0:
+                    this.segments.nextLabel(detail.segn, 1);
+                    break;
+                case 2:
+                    this.segments.nextLabel(detail.segn, -1);
+                    break;
+            }
         }
     }
 

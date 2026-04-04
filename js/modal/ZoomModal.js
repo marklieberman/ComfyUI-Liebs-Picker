@@ -109,12 +109,13 @@ export class ZoomModal extends BaseModal {
         });
 
         // Initialize the modal controls.
+        this.pressedKeys = new Set();
         this.pickerMode = options.pickerMode ?? 'picker';
         this.pickerModeMustPick = options.pickerModeMustPick ?? false;
         this.pickerLocked = options.pickerLocked ?? false;
         this.setImageList(options.imageList, options.index);
         this.setTitle(options.title);
-        this.setSubtitle();        
+        this.setSubtitle();
 
         if (this.pickerLocked) {
             this.classList.add("picker-locked");
@@ -167,14 +168,21 @@ export class ZoomModal extends BaseModal {
         let handled = false;
 
         const letterKey = event.key.toUpperCase();
+        this.pressedKeys.add(letterKey);
 
         let n = parseInt(event.key);
         if (Number.isInteger(n)) {
             n = (n === 0) ? 9 : n - 1;
-            if (this.segsControls && event.altKey && this.isSegmentsVisible()) {
-                // Cycle segment labels of the Nth segment of the focused image when alt-key is pressed.
-                const index = this.el.image.index;
-                this.el.image.imageList.getImageSegments(index)?.nextLabel(n);
+            if (event.altKey && this.segsControls && this.isSegmentsVisible()) {
+                const index = this.el.image.index,
+                      segments = this.el.image.imageList.getImageSegments(index);
+                if (this.pressedKeys.has('X')) {
+                    // Alt+X+{n} shortcut to unwant a segment of the image.
+                    segments?.toggleUnwanted(n);
+                } else {
+                    // Alt+{n} to cycle the Nth segment label of the image.                
+                    segments?.nextLabel(n);
+                }
             }
         } else         
         // Back to grid view with spacebar.
@@ -226,7 +234,7 @@ export class ZoomModal extends BaseModal {
             }
         } else
         // Unwant an image with X.
-        if (!this.pickerLocked && (letterKey === 'X' || letterKey === '\'')) {
+        if (!this.pickerLocked && !event.altKey && (letterKey === 'X' || letterKey === '\'')) {
             handled = true;
             const imageList = this.el.image.imageList,
                 index = this.el.image.index;                
@@ -250,6 +258,14 @@ export class ZoomModal extends BaseModal {
             event.preventDefault();
             event.stopPropagation();
         }
+
+        this.chordStart = false;
+    }
+
+    // Handle keyup in the modal.
+    onKeyUp(event) {
+        const letterKey = event.key.toUpperCase();
+        this.pressedKeys.delete(letterKey);
     }
 
     // Handle wheel events in the model.

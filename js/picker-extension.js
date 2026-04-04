@@ -121,6 +121,7 @@ app.registerExtension({
                 case 'send': 
                     body.result = 'send';
                     body.selection = imageList.getResult()
+                    console.log(body.selection);
                     break;
                 case 'cancel': 
                     body.result = 'cancel';

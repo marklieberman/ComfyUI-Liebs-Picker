@@ -28,7 +28,8 @@ export class ImageList extends EventTarget {
                         image: item,                        
                         index: i,
                         segn: event.detail.segn,
-                        label: event.detail.label
+                        label: event.detail.label,
+                        unwanted: event.detail.unwanted
                     }
                 }));
             });
@@ -178,7 +179,7 @@ export class ImageList extends EventTarget {
                 result.push({
                     index: Number(i),
                     segments: {
-                        label: item.segments.label
+                        label: item.segments.getResult()
                     }
                 })
             }
